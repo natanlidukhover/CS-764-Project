@@ -13,13 +13,6 @@ std::vector<int> getParameters(int size) {
     return test;
 }
 
-
-// Convert integer to binary string
-std::string intToBinaryString(int number) {
-    std::bitset<32> binary(number); // Assume 32-bit integer
-    return binary.to_string();
-}
-
 // Save vector of integers to file in binary format
 void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string& filename) {
     std::ofstream outFile(filename, std::ios::binary);
@@ -29,8 +22,7 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
     }
     
     for (int number : numbers) {
-        std::string binaryString = intToBinaryString(number);
-        outFile << binaryString << std::endl;  // Write binary string to file
+        outFile << number << std::endl;  // Write binary string to file
     }
     outFile.close();
 }
