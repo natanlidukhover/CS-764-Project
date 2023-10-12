@@ -1,15 +1,38 @@
 #include "Scan.h"
-#include "defs.h"
+#include "defs.cpp"
+#include <vector>
 
-void generateRows() {
-	X = 1000;
-	std::vector<int> rows;
+std::vector<int> getParameters(int size) {
+    std::vector<int> test;
+    int i = 0;
+    
+    while (i < size/4) {
+        test.push_back(static_cast<int>(Random(0, 9)));  // Appending a random number
+        i++;
+    }
+    return test;
+}
 
-	for (int i = 0; i < X; i++) {
-		size_t randomNumber = Random(9);
-		rows.push_back(randomNumber);
-	}
-	fprintf(rows);
+
+// Convert integer to binary string
+std::string intToBinaryString(int number) {
+    std::bitset<32> binary(number); // Assume 32-bit integer
+    return binary.to_string();
+}
+
+// Save vector of integers to file in binary format
+void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string& filename) {
+    std::ofstream outFile(filename, std::ios::binary);
+    if (!outFile) {
+        std::cerr << "Could not open file: " << filename << std::endl;
+        return;
+    }
+    
+    for (int number : numbers) {
+        std::string binaryString = intToBinaryString(number);
+        outFile << binaryString << std::endl;  // Write binary string to file
+    }
+    outFile.close();
 }
 
 ScanPlan::ScanPlan (RowCount const count) : _count (count)
