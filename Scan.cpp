@@ -1,4 +1,16 @@
 #include "Scan.h"
+#include "defs.h"
+
+void generateRows() {
+	X = 1000;
+	std::vector<int> rows;
+
+	for (int i = 0; i < X; i++) {
+		size_t randomNumber = Random(9);
+		rows.push_back(randomNumber);
+	}
+	fprintf(rows);
+}
 
 ScanPlan::ScanPlan (RowCount const count) : _count (count)
 {
@@ -20,6 +32,7 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	_plan (plan), _count (0)
 {
 	TRACE (true);
+	generateRows();
 } // ScanIterator::ScanIterator
 
 ScanIterator::~ScanIterator ()
