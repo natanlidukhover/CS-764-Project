@@ -1,3 +1,5 @@
+#include <cstddef>
+
 class Row
 {
 public:
@@ -14,8 +16,8 @@ class Table
 public:
 	Table(size_t NumRows, size_t NumCols, size_t RecordSize);
 	~Table();
-	unsigned short operator[](size_t row, col);
+	Row operator[](size_t row);
 private:
-	Row::Row **_table;
+	Row **_table;
 	size_t _NumRows, _NumCols, _RecordSize;
-}
+};

@@ -1,4 +1,6 @@
 #include "Row.h"
+#include "Dram.h"
+#include <cstdlib>
 
 Row::Row(size_t RowSize, size_t RecordSize):_RowSize(RowSize),
 	_RecordSize(RecordSize)
@@ -21,7 +23,7 @@ Table::Table(size_t NumRows, size_t NumCols, size_t RecordSize):_NumRows(NumRows
 	_NumCols(NumCols), _RecordSize(RecordSize)
 {
 	size_t RowSize = RecordSize * NumCols;
-	_table = (Row::Row **)malloc(sizeof(Row::Row *) * NumRows);
+	_table = (Row **)malloc(sizeof(Row *) * NumRows);
 	for (int i = 0; i < NumRows; i++) {
 		_table[i] = new Row(RowSize, RecordSize);
 	}
@@ -34,6 +36,6 @@ Table::~Table()
 	}
 }
 
-unsigned short Table::operator[][](size_t row, size_t col) {
-	return *(_table[row])[col];
+Row Table::operator[](size_t row) {
+	return *(_table[row]);
 }
