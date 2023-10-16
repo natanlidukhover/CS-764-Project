@@ -31,7 +31,7 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
 
 // Read vector of integers from file in binary format
 void readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
-    ifstream inFile ("testData.bin", ios::in | ios::binary);
+    ifstream inFile (filename, ios::in | ios::binary);
     inFile.seekg(0, ios::end);
     int file_size = inFile.tellg();
     cout<<"Size of the file is"<<" "<< file_size<<" "<<"bytes" << "\n";
@@ -41,7 +41,8 @@ void readIntegersFromBinaryFile(const std::string& filename, int recordSize, int
     {
         char x[recordSize];
         inFile.read(x, recordSize);
-        cout<< x[0]<< " " << x[1] << " " << x[2] << " " << x[3] << endl;
+        for(auto c: x) cout << c ;
+        cout << "\n";
         char space;
         inFile.read(&space, 1);
         numberOfRecordsToRead -= 1;
@@ -72,7 +73,7 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	TRACE (true);
 	//std::vector<int> test = getParameters(40);
     //saveIntegersToBinaryFile(test, "testData.bin");
-    readIntegersFromBinaryFile("testData.bin", 4, 4);
+    readIntegersFromBinaryFile("./data/testData.bin", 7, 4);
 } // ScanIterator::ScanIterator
 
 ScanIterator::~ScanIterator ()
