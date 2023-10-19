@@ -18,62 +18,21 @@ std::vector<int> getParameters(int size) {
 
 // Save vector of integers to file in binary format
 void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string& filename) {
-    std::ofstream outFile("testData.bin", std::ios::binary | std::ios::ate);
+    std::ofstream outFile(filename, std::ios::binary | std::ios::ate);
     if (!outFile) {
         std::cerr << "Could not open file: " << filename << std::endl;
         return;
     }
-    //int y = 9;
-    cout << filename << "\n";
     for(int x: numbers)
     {
         cout << x << " ";
         //outFile.write(reinterpret_cast<char*>(&x),sizeof(int));
-        outFile.write((char*)&x,sizeof(x));
+        outFile.write((char*)&x,1);
     }
-    //outFile.write((char*)&y,sizeof(y));
-    //outFile.write((char*)&y,sizeof(y));
     outFile.close();
-    std::ifstream inFile("testData.bin", std::ios::binary | std::ios::ate);
-    
+    std::ifstream inFile(filename, std::ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
-    //inFile.seekg(0, ios::end);
-    //int fileSize = inFile.tellg();
-    cout << "Test1 file size" << fileSize;
-
-    // const char* FILENAM = "./data/testData.bin";
-    // int toStore = 10;
-    // ofstream o(FILENAM,ios::binary);
-
-    // o.write((char*)&toStore,sizeof(toStore));
-    // o.close();
-
-    // int toRestore=0;
-    // ifstream i(FILENAM,ios::binary);
-    // i.read((char*)&toRestore,sizeof(toRestore));
-
-    // cout << toRestore << endl;
-    // outFile.write (0, numbers.size());
-
-    // for (int number : numbers) {
-    //     //outFile << number << std::endl;  // Write binary string to file
-    // }
-    std::ofstream outFile2("testData2.bin", std::ios::binary | std::ios::ate);
-    //int test2 = 9;
-    for(int x: numbers)
-    {
-        //cout << x << " ";
-        //outFile.write(reinterpret_cast<char*>(&x),sizeof(int));
-        outFile2 << x;
-    }
-    //outFile2 << test2 ;
-    //outFile2 << test2 ;
-    outFile2.close();
-    std::ifstream inFile2("testData2.bin", std::ios::binary | std::ios::ate);
-    //inFile.seekg(0, ios::end);
-    //int fileSize2 = inFile.tellg();
-    std::streamsize fileSize2 = inFile2.tellg();
-    cout << "Test2 file size" << fileSize2;
+    cout << "Test file size" << fileSize << "\n";
     }
 
 // Read vector of integers from file in binary format
@@ -121,8 +80,8 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	_plan (plan), _count (0)
 {
 	TRACE (true);
-	std::vector<int> test = getParameters(8);
-    saveIntegersToBinaryFile(test, "testData.bin");
+	std::vector<int> test = getParameters(40);
+    saveIntegersToBinaryFile(test, "./data/testData.bin");
     //readIntegersFromBinaryFile("./data/testData.bin", 7, 4);
 } // ScanIterator::ScanIterator
 
