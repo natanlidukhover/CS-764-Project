@@ -33,30 +33,29 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
     std::ifstream inFile(filename, std::ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
     cout << "Test file size" << fileSize << "\n";
+    inFile.close();
     }
 
 // Read vector of integers from file in binary format
 // compile using make
+//TODO
+// Size of file using sstats in C
+// Figuring out the binary thing using that commit 
+// use Row and Table class to store integers
 void readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
-    ifstream inFile ("testData.bin", ios::in | ios::binary);
-    inFile.seekg(0, ios::end);
-    int file_size = inFile.tellg();
-    cout<<"Size of the file is"<<" "<< file_size<<" "<<"bytes" << "\n";
-    inFile.seekg(0);
-    // Size of file using sstats in C
-    // Figuring out the binary thing using that commit 
-    // use Row and Table class to store integers
+    ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
+    std::streamsize fileSize = inFile.tellg();
+    cout << "Size of the file is "<< fileSize<<" bytes" << "\n";
+
+    //seekg used as ate mode moves it to end of file
+    inFile.seekg(0, ios::beg);
     while(numberOfRecordsToRead > 0)
     {
-        char x[recordSize];
-        inFile.read(x, recordSize);
-        for(auto c: x) cout << c ;
-        cout << "\n";
-        char space;
-        inFile.read(&space, 1);
+        unsigned short int y;
+        inFile.read((char*)(&y), recordSize);
+        cout << "Char " << y << " \n";
         numberOfRecordsToRead -= 1;
     }
-    
     inFile.close();
 }
 
@@ -81,8 +80,9 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 {
 	TRACE (true);
 	std::vector<int> test = getParameters(40);
-    saveIntegersToBinaryFile(test, "./data/testData.bin");
-    //readIntegersFromBinaryFile("./data/testData.bin", 7, 4);
+    string file = "./data/testData.bin";
+    saveIntegersToBinaryFile(test, file);
+    readIntegersFromBinaryFile(file, 1, 6);
 } // ScanIterator::ScanIterator
 
 ScanIterator::~ScanIterator ()
