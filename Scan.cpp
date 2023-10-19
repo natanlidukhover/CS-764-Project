@@ -39,8 +39,6 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
 // Read vector of integers from file in binary format
 // compile using make
 //TODO
-// Size of file using sstats in C
-// Figuring out the binary thing using that commit 
 // use Row and Table class to store integers
 void readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
