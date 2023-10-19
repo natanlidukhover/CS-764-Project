@@ -25,14 +25,13 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
     }
     for(int x: numbers)
     {
-        cout << x << " ";
         //outFile.write(reinterpret_cast<char*>(&x),sizeof(int));
         outFile.write((char*)&x,1);
     }
     outFile.close();
     std::ifstream inFile(filename, std::ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
-    cout << "Test file size" << fileSize << "\n";
+    cout << fileSize << "bytes written to file" << filename << std::endl;
     inFile.close();
     }
 
@@ -43,16 +42,18 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
 void readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
-    cout << "Size of the file is "<< fileSize<<" bytes" << "\n";
+    cout << "Size of input file is "<< fileSize << " bytes" << std::endl;
 
     //seekg used as ate mode moves it to end of file
     inFile.seekg(0, ios::beg);
+    vector<int> res;
     while(numberOfRecordsToRead > 0)
     {
         unsigned short int y;
         inFile.read((char*)(&y), recordSize);
         cout << "Char " << y << " \n";
         numberOfRecordsToRead -= 1;
+        res.push_back(y);
     }
     inFile.close();
 }
