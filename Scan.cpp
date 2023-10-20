@@ -1,19 +1,25 @@
 #include "Scan.h"
 #include "defs.h"
 #include <vector>
+#include <random>
 #include<iostream>
 #include<fstream>
 using namespace std;
+
 std::vector<int> getParameters(int size) {
-    std::vector<int> test;
+    std::vector<int> intVector;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 9);
+
     int i = 0;
     
     while (i < size/4) {
-        test.push_back(static_cast<int>(Random(0, 9)));  // Appending a random number
+        int random_number = dis(gen);
+        intVector.push_back(random_number);  // Appending a random number
         i++;
     }
-    
-    return test;
+    return intVector;
 }
 
 // Save vector of integers to file in binary format
