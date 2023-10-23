@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <cstdio>
+#include "Row.h"
 
 typedef uint8_t byte;
 
@@ -134,3 +135,4 @@ size_t msb (size_t const x);
 int msbi (size_t const x);
 char const * YesNo (bool const b);
 char const * OkBad (bool const b);
+unsigned short calculateOffsetValueCode(Row * prevRow, Row * currentRow, size_t domain,  size_t arity, bool isAscending);
