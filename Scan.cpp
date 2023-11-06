@@ -1,9 +1,11 @@
-#include "Scan.h"
-#include "defs.h"
-#include <vector>
+#include <fstream>
+#include <iostream>
 #include <random>
-#include<iostream>
-#include<fstream>
+#include <vector>
+
+#include "defs.h"
+#include "Scan.h"
+
 using namespace std;
 
 std::vector<int> getParameters(int size) {

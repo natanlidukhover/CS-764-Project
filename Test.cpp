@@ -1,6 +1,6 @@
+#include "Filter.h"
 #include "Iterator.h"
 #include "Scan.h"
-#include "Filter.h"
 #include "Sort.h"
 
 int main (int argc, char * argv [])

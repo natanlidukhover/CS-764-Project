@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cstdio>
+#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <cstdio>
+
 #include "Row.h"
 
 typedef uint8_t byte;

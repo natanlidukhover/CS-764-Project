@@ -1,5 +1,6 @@
-#include "Dram.h"
 #include <stdint.h>
+
+#include "Dram.h"
 
 Dram::Dram(size_t Size): _Size(Size), _SizeOccupied(0)
 {

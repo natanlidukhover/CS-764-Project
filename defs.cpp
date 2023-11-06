@@ -1,8 +1,7 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "defs.h"
-#include "Row.h"
 
 // -----------------------------------------------------------------
 
@@ -93,13 +92,14 @@ char const * OkBad (bool const b)
  * @param domain is the size_t representing the number of values that can be placed as a Record
  * @param artiy is the size_t representing the number of columns
 */
-unsigned short calculateOffsetValueCode(Row * prevRow, Row * currentRow, size_t domain,  size_t arity, bool isAscending) {
-	unsigned short offset = prevRow->_RowSize;
+unsigned short calculateOffsetValueCode(Row prevRow, Row currentRow, size_t domain,  size_t arity, bool isAscending) {
+	unsigned short offset = prevRow._RowSize;
 	unsigned short value = domain;
-	for (unsigned short i = 0; i < prevRow->_RowSize; i++) {
+	for (unsigned short i = 0; i < prevRow._RowSize; i++) {
 		if (currentRow[i] != prevRow[i]) {
 			offset = i;
 			value = currentRow[i];
+			break;
 		}
 	}
 
@@ -112,7 +112,7 @@ unsigned short calculateOffsetValueCode(Row * prevRow, Row * currentRow, size_t 
 	// E.g. domain is 1 to 99 -> 100; offset is 3; value is 94 (domain 100 - actual value of 6);
 	// zerosInDomain = floor(log10(abs(100))) = floor(2) = 2;
 	// offsetValueCode = offset * 10^2 + value = 3 * 100 + 94 = 300 + 94 = 394
-	unsigned short zerosInDomain = floor(log10(abs(domain)));
+	unsigned short zerosInDomain = floor(log10(domain));
 	unsigned short offsetValueCode = offset * pow(10, zerosInDomain);
 	return offsetValueCode + value;
 }

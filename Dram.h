@@ -1,3 +1,6 @@
+#ifndef _DRAM_H_
+#define _DRAM_H_
+
 #include <cstdlib>
 
 class Dram
@@ -13,3 +16,5 @@ private:
 };
 
 extern Dram dram;
+
+#endif // _DRAM_H
