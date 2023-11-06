@@ -93,9 +93,9 @@ char const * OkBad (bool const b)
  * @param artiy is the size_t representing the number of columns
 */
 unsigned short calculateOffsetValueCode(Row prevRow, Row currentRow, size_t domain,  size_t arity, bool isAscending) {
-	unsigned short offset = prevRow._RowSize;
+	unsigned short offset = prevRow._rowSize;
 	unsigned short value = domain;
-	for (unsigned short i = 0; i < prevRow._RowSize; i++) {
+	for (unsigned short i = 0; i < prevRow._rowSize; i++) {
 		if (currentRow[i] != prevRow[i]) {
 			offset = i;
 			value = currentRow[i];

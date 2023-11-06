@@ -3,26 +3,26 @@
 
 #include <cstddef>
 
-class Row
-{
+class Row {
 public:
-	Row(size_t RowSize, size_t RecordSize);
-	~Row();
-	unsigned short operator[](size_t index);
-	size_t _RowSize, _RecordSize;
-private:
-	void *_row;
-}; // class Record
+    Row(size_t rowSize, size_t recordSize);
+    ~Row();
+    unsigned short operator[](size_t index);
+    size_t _rowSize, _recordSize;
 
-class Table
-{
-public:
-	Table(size_t NumRows, size_t NumCols, size_t RecordSize);
-	~Table();
-	Row operator[](size_t row);
 private:
-	Row **_table;
-	size_t _NumRows, _NumCols, _RecordSize;
+    void* _row;
+};  // class Record
+
+class Table {
+public:
+    Table(size_t numRows, size_t numCols, size_t recordSize);
+    ~Table();
+    Row operator[](size_t row);
+
+private:
+    Row** _table;
+    size_t _numRows, _numCols, _recordSize;
 };
 
-#endif // _ROW_H_
+#endif  // _ROW_H_

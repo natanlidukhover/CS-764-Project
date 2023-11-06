@@ -1,40 +1,38 @@
+#include "Row.h"
+
 #include <cstdlib>
 
 #include "Dram.h"
-#include "Row.h"
 
-Row::Row(size_t RowSize, size_t RecordSize):_RowSize(RowSize),
-	_RecordSize(RecordSize)
-{
-	// row = new vector<uint8_t>(RowSize);
-	// We cannot do the above thing since we have to use emulated RAM
-	_row = dram.GetSpace(RowSize);
-}
-Row::~Row()
-{
-	dram.FreeSpace(_row, _RowSize);
-}
-unsigned short Row::operator[](size_t index)
-{
-	//TODO Add error checking code
-	return ((unsigned short *)_row)[index];
+Row::Row(size_t rowSize, size_t recordSize)
+    : _rowSize(rowSize), _recordSize(recordSize) {
+    // row = new vector<uint8_t>(rowSize);
+    // We cannot do the above thing since we have to use emulated RAM
+    _row = dram.getSpace(rowSize);
 }
 
-Table::Table(size_t NumRows, size_t NumCols, size_t RecordSize):_NumRows(NumRows),
-	_NumCols(NumCols), _RecordSize(RecordSize)
-{
-	size_t RowSize = RecordSize * NumCols;
-	_table = (Row **)malloc(sizeof(Row *) * NumRows);
-	for (size_t i = 0; i < NumRows; i++) {
-		_table[i] = new Row(RowSize, RecordSize);
-	}
+Row::~Row() {
+	dram.freeSpace(_row, _rowSize);
 }
 
-Table::~Table()
-{
-	for (int i = _NumRows - 1; i >= 0; i--) {
-		delete _table[i];
-	}
+unsigned short Row::operator[](size_t index) {
+    // TODO Add error checking code
+    return ((unsigned short*) _row)[index];
+}
+
+Table::Table(size_t numRows, size_t numCols, size_t recordSize)
+    : _numRows(numRows), _numCols(numCols), _recordSize(recordSize) {
+    size_t rowSize = recordSize * numCols;
+    _table = (Row**) malloc(sizeof(Row*) * numRows);
+    for (size_t i = 0; i < numRows; i++) {
+        _table[i] = new Row(rowSize, recordSize);
+    }
+}
+
+Table::~Table() {
+    for (int i = _numRows - 1; i >= 0; i--) {
+        delete _table[i];
+    }
 }
 
 Row Table::operator[](size_t row) {
