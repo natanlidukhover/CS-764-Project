@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "defs.h"
+#include "Table.h"
 
 // -----------------------------------------------------------------
 
@@ -92,13 +93,14 @@ char const * OkBad (bool const b)
  * @param domain is the size_t representing the number of values that can be placed as a Record
  * @param artiy is the size_t representing the number of columns
 */
-unsigned short calculateOffsetValueCode(Row prevRow, Row currentRow, size_t domain,  size_t arity, bool isAscending) {
-	unsigned short offset = prevRow._rowSize;
+unsigned short calculateOffsetValueCode(Table t, size_t prevRow, size_t
+		currentRow, size_t domain,  size_t arity, bool isAscending) {
+	unsigned short offset = t._rowSize;
 	unsigned short value = domain;
-	for (unsigned short i = 0; i < prevRow._rowSize; i++) {
-		if (currentRow[i] != prevRow[i]) {
+	for (unsigned short i = 0; i < t._rowSize; i++) {
+		if (t[currentRow][i] != t[prevRow][i]) {
 			offset = i;
-			value = currentRow[i];
+			value = t[currentRow][i];
 			break;
 		}
 	}

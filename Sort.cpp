@@ -1,4 +1,5 @@
 #include "Sort.h"
+#include <iostream>
 
 SortPlan::SortPlan (Plan * const input) : _input (input)
 {
@@ -48,3 +49,55 @@ bool SortIterator::next ()
 	++ _produced;
 	return true;
 } // SortIterator::next
+
+int partition(Table& t, int startRow, int endRow, int col) {
+	int pivot = endRow;
+	int i = startRow - 1;
+	uint8_t *tmp;
+	int cmp_col;
+
+	for (int j = startRow; j <= endRow - 1; j++) {
+		cmp_col = col;
+		while (t(j, cmp_col) == t(pivot, cmp_col)) {
+			cmp_col = (cmp_col + 1) % t._rowSize;
+			if (cmp_col == col)
+				break;
+		}
+		if (t(j, cmp_col) < t(pivot, cmp_col)) {
+			i++;
+			tmp = *t(i);
+			*t(i) = *t(j);
+			*t(j) = tmp;
+		}
+	}
+	i++;
+	tmp = *t(i);
+	*t(i) = *t(endRow);
+	*t(endRow) = tmp;
+	return i;
+}
+
+void generateRuns(Table& t, int startRow, int endRow, int col) {
+	int pivot;
+	if (startRow >= endRow || startRow < 0)
+		return;
+	pivot = partition(t, startRow, endRow, col);
+	generateRuns(t, startRow, pivot - 1, col);
+	generateRuns(t, pivot + 1, endRow, col);
+}
+
+void verifySortedRuns(Table &t, int startRow, int endRow, int col) {
+	int cmp_col;
+	for (int i = startRow + 1; i <= endRow; i++) {
+		cmp_col = col;
+		while (t(i, cmp_col) == t(i - 1, cmp_col)) {
+			cmp_col = (cmp_col + 1) % t._rowSize;
+			if (cmp_col == col)
+				break;
+		}
+		if (t(i, cmp_col) < t(i - 1, cmp_col)) {
+			std::cout << "unsorted at row:" << i << std::endl;
+			return;
+		}
+	}
+}

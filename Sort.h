@@ -1,4 +1,5 @@
 #include "Iterator.h"
+#include "Table.h"
 
 class SortPlan : public Plan
 {
@@ -22,3 +23,6 @@ private:
 	Iterator * const _input;
 	RowCount _consumed, _produced;
 }; // class SortIterator
+
+void generateRuns(Table& t, int startRow, int endRow, int col);
+void verifySortedRuns(Table &t, int startRow, int endRow, int col);
