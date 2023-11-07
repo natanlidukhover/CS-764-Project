@@ -7,7 +7,11 @@
 #include "Scan.h"
 
 using namespace std;
-
+/**
+ * Generates size integers of 1 byte each randomly
+ * 
+ * @param size Size of the file to be generated in bytes. Eg: To generate a file of 50KB will be 50*1024 as the size parameter
+*/
 std::vector<int> getParameters(int size) {
     std::vector<int> intVector;
     std::random_device rd;
@@ -16,7 +20,7 @@ std::vector<int> getParameters(int size) {
 
     int i = 0;
     
-    while (i < size/4) {
+    while (i < size) {
         int random_number = dis(gen);
         intVector.push_back(random_number);  // Appending a random number
         i++;
@@ -39,7 +43,7 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
     outFile.close();
     std::ifstream inFile(filename, std::ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
-    cout << fileSize << "bytes written to file" << filename << std::endl;
+    cout << fileSize << " bytes written to file" << filename << std::endl;
     inFile.close();
     }
 
@@ -47,23 +51,23 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
 // compile using make
 //TODO
 // use Row and Table class to store integers
-void readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
+vector<int> readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
+    vector<int> res;
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
     cout << "Size of input file is "<< fileSize << " bytes" << std::endl;
 
     //seekg used as ate mode moves it to end of file
     inFile.seekg(0, ios::beg);
-    vector<int> res;
     while(numberOfRecordsToRead > 0)
     {
-        unsigned short int y;
+        unsigned short int y = 0;
         inFile.read((char*)(&y), recordSize);
-        cout << "Char " << y << " \n";
         numberOfRecordsToRead -= 1;
         res.push_back(y);
     }
     inFile.close();
+    return res;
 }
 
 ScanPlan::ScanPlan (RowCount const count) : _count (count)
@@ -86,10 +90,13 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	_plan (plan), _count (0)
 {
 	TRACE (true);
-	std::vector<int> test = getParameters(40);
+    // numbers to generate
+    int countOfNumbers = 10;
+	std::vector<int> test = getParameters(countOfNumbers);
     string file = "./data/testData.bin";
     saveIntegersToBinaryFile(test, file);
-    readIntegersFromBinaryFile(file, 1, 6);
+    vector<int> numbers = readIntegersFromBinaryFile(file, 1, countOfNumbers/5);
+    for(auto i : numbers) cout << i << " ";
 } // ScanIterator::ScanIterator
 
 ScanIterator::~ScanIterator ()
