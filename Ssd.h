@@ -1,28 +1,27 @@
 #ifndef SSD_H
 #define SSD_H
 
-#include <cstddef>
-#include <new> // Required for std::bad_alloc
+#include <cstdio>
+#include <cstdlib>
+
+constexpr size_t PAGE_SIZE = 8192; //8KB of data
 
 class Ssd {
-private:
-    size_t _size;          // Total size of the SSD
-    size_t _sizeOccupied;  // Currently occupied size
-    void* startPtr;        // Starting pointer of the SSD memory block
-
 public:
-    // Constructor to initialize an SSD with a given size
-    Ssd(size_t size);
-
-    // Destructor to free allocated memory
+    Ssd(const char* filename, size_t size);
     ~Ssd();
+    void* writeData(const void* data);
+    void* readData(void* buffer, size_t offset);
 
-    // Function to simulate writing data to the SSD
-    void* writeData(const void* data, size_t size);
+    size_t getReadCount() const;
+    size_t getWriteCount() const;
 
-    // Function to simulate reading data from the SSD
-    void* readData(void* buffer, size_t size, size_t offset);
-
+private:
+    FILE* filePtr;
+    size_t _size;
+    size_t _sizeOccupied;
+    size_t _readCount;  // read call counter
+    size_t _writeCount; // write call counter
 };
 
 #endif // SSD_H
