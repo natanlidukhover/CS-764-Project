@@ -28,7 +28,12 @@ std::vector<int> getParameters(int size) {
     return intVector;
 }
 
-// Save vector of integers to file in binary format
+/**
+ * Save vector of integers to file in binary format
+ * 
+ * @param numbers Vector of numbers to be written to file. The numbers are single digit numbers in the range of 1 to 10
+ * @param filename The binary filename where the above vector numbers will be written
+*/
 void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string& filename) {
     std::ofstream outFile(filename, std::ios::binary | std::ios::ate);
     if (!outFile) {
@@ -48,9 +53,16 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
     }
 
 // Read vector of integers from file in binary format
-// compile using make
 //TODO
 // use Row and Table class to store integers
+/**
+ * Read vector of integers from file in binary format
+ * 
+ * @param filename The binary filename from where the we will read integers
+ * @param recordSize The number of bytes we want to consume during one read
+ * @param numberOfRecordsToRead Number of records of size recordSize to be read from the binary file
+ *
+*/
 vector<int> readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
     vector<int> res;
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
