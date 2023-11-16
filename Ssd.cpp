@@ -24,7 +24,7 @@ private:
 };
 
 Ssd::Ssd(const char* filename, size_t size) : _size(size), _sizeOccupied(0), _readCount(0), _writeCount(0) {
-    filePtr = fopen(filename, "INSERT FILE NAME"); // insert filename here
+    filePtr = fopen(filename, "w+");
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
     }
