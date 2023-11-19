@@ -10,12 +10,22 @@
 using namespace std;
 int main(int argc, char* argv[]) {
     TRACE(true);
+	int count = 9;
+	Plan * const plan = new ScanPlan (count);
+	new SortPlan ( new FilterPlan ( new ScanPlan (count) ) );
 
-	int n = 10;// * 1024;
+	Iterator * const it = plan->init ();
+	it->run ();
+
+	//ScanPlan * const sc_plan = new ScanPlan (count);
+	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (count));
+	vector<int> numbers = sc_it->run();
+	int n = 3;// * 1024;
 	Table tmp(n, n, 1);
+	int k = 0;
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n; j++) {
-			tmp[i][j] = Random(10);//n - i+j;
+			tmp[i][j] = numbers[k++]; //Random(10);//n - i+j;
 			cout << (int)tmp[i][j];
 			cout << " ";
 		}
@@ -27,6 +37,7 @@ int main(int argc, char* argv[]) {
 	generateRuns(tmp, 0, n - 1, sort_col);
 	verifySortedRuns(tmp, 0, n - 1, sort_col);
 
+	cout << "Sorted table" << "\n";
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n; j++) {
 			cout << (int)tmp[i][j] << " ";
@@ -34,11 +45,7 @@ int main(int argc, char* argv[]) {
 		cout << "\n";
 	}
 
-	// Plan * const plan = new ScanPlan (7);
-	// new SortPlan ( new FilterPlan ( new ScanPlan (7) ) );
-
-	// Iterator * const it = plan->init ();
-	// it->run ();
+	
 	// delete it;
 
 	// delete plan;

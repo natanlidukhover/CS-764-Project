@@ -7,12 +7,62 @@
 #include "Scan.h"
 
 using namespace std;
+
+
+
+ScanPlan::ScanPlan (RowCount const count) : _count (count)
+{
+	TRACE (true);
+} // ScanPlan::ScanPlan
+
+ScanPlan::~ScanPlan ()
+{
+	TRACE (true);
+} // ScanPlan::~ScanPlan
+
+Iterator * ScanPlan::init () const
+{
+	TRACE (true);
+	return new ScanIterator (this);
+} // ScanPlan::init
+
+ScanIterator::ScanIterator (ScanPlan const * const plan) :
+	_plan (plan), _count (plan->_count)
+{
+	TRACE (true);
+    // numbers to generate
+    // int countOfNumbers = 10;
+	// std::vector<int> test = getParameters(countOfNumbers);
+    // string file = "./data/testData.bin";
+    // saveIntegersToBinaryFile(test, file);
+    // vector<int> numbers = readIntegersFromBinaryFile(file, 1, countOfNumbers/5);
+    // for(auto i : numbers) cout << i << " ";
+} // ScanIterator::ScanIterator
+
+ScanIterator::~ScanIterator ()
+{
+	TRACE (true);
+	traceprintf ("produced %lu of %lu rows\n",
+			(unsigned long) (_count),
+			(unsigned long) (_plan->_count));
+} // ScanIterator::~ScanIterator
+
+bool ScanIterator::next ()
+{
+	TRACE (true);
+	if (_count >= _plan->_count)
+		return false;
+
+	++ _count;
+	return true;
+} // ScanIterator::next
+
 /**
  * Generates size integers of 1 byte each randomly
  * 
  * @param size Size of the file to be generated in bytes. Eg: To generate a file of 50KB will be 50*1024 as the size parameter
 */
-std::vector<int> getParameters(int size) {
+std::vector<int> ScanIterator::getParameters(int size) {
     std::vector<int> intVector;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -34,7 +84,7 @@ std::vector<int> getParameters(int size) {
  * @param numbers Vector of numbers to be written to file. The numbers are single digit numbers in the range of 1 to 10
  * @param filename The binary filename where the above vector numbers will be written
 */
-void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string& filename) {
+void ScanIterator::saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string& filename) {
     std::ofstream outFile(filename, std::ios::binary | std::ios::ate);
     if (!outFile) {
         std::cerr << "Could not open file: " << filename << std::endl;
@@ -63,7 +113,7 @@ void saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string
  * @param numberOfRecordsToRead Number of records of size recordSize to be read from the binary file
  *
 */
-vector<int> readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
+vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) {
     vector<int> res;
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
@@ -82,50 +132,14 @@ vector<int> readIntegersFromBinaryFile(const std::string& filename, int recordSi
     return res;
 }
 
-ScanPlan::ScanPlan (RowCount const count) : _count (count)
+vector<int> ScanIterator::run ()
 {
 	TRACE (true);
-} // ScanPlan::ScanPlan
-
-ScanPlan::~ScanPlan ()
-{
-	TRACE (true);
-} // ScanPlan::~ScanPlan
-
-Iterator * ScanPlan::init () const
-{
-	TRACE (true);
-	return new ScanIterator (this);
-} // ScanPlan::init
-
-ScanIterator::ScanIterator (ScanPlan const * const plan) :
-	_plan (plan), _count (0)
-{
-	TRACE (true);
-    // numbers to generate
-    int countOfNumbers = 10;
-	std::vector<int> test = getParameters(countOfNumbers);
+    int countOfNumbers = this->_count;
+	std::vector<int> test = this->getParameters(countOfNumbers);
     string file = "./data/testData.bin";
-    saveIntegersToBinaryFile(test, file);
-    vector<int> numbers = readIntegersFromBinaryFile(file, 1, countOfNumbers/5);
-    for(auto i : numbers) cout << i << " ";
-} // ScanIterator::ScanIterator
-
-ScanIterator::~ScanIterator ()
-{
-	TRACE (true);
-	traceprintf ("produced %lu of %lu rows\n",
-			(unsigned long) (_count),
-			(unsigned long) (_plan->_count));
-} // ScanIterator::~ScanIterator
-
-bool ScanIterator::next ()
-{
-	TRACE (true);
-
-	if (_count >= _plan->_count)
-		return false;
-
-	++ _count;
-	return true;
+    this->saveIntegersToBinaryFile(test, file);
+    vector<int> numbers = readIntegersFromBinaryFile(file, 1, countOfNumbers);
+    return numbers;
+	//++ _count;
 } // ScanIterator::next
