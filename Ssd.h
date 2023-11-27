@@ -9,7 +9,7 @@ public:
     Ssd(const char* filename, size_t size, size_t blockSize);
     ~Ssd();
     int writeData(const void* data, size_t seek);
-    void* readData(void* buffer, size_t offset);
+    int readData(void* buffer, size_t offset);
 
     size_t getReadCount() const;
     size_t getWriteCount() const;
