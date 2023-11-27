@@ -38,6 +38,9 @@ void Assert (bool const predicate,
 #define SUCCESS (0)
 #define FEOF	(1)
 #define FIO		(2)
+#define EINPARM (3)
+#define EEMPTY	(4)
+#define EFULL	(5)
 
 
 // -----------------------------------------------------------------
