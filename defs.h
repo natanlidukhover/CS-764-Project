@@ -35,6 +35,11 @@ void Assert (bool const predicate,
 		__FILE__, __LINE__, __FUNCTION__), \
 	printf
 
+#define SUCCESS (0)
+#define FEOF	(1)
+#define FIO		(2)
+
+
 // -----------------------------------------------------------------
 
 class Trace
