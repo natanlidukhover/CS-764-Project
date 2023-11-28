@@ -1,11 +1,15 @@
-#include "defs.h"
 #include "Ssd.h"
+
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 
+#include "defs.h"
+
 Ssd::Ssd(const char* filename, size_t size, size_t blockSize) : _size(size),
-	_readCount(0), _writeCount(0), _blockSize(blockSize) {
+                                                                _readCount(0),
+                                                                _writeCount(0),
+                                                                _blockSize(blockSize) {
     filePtr = fopen(filename, "w+");
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
@@ -30,7 +34,7 @@ int Ssd::writeData(const void* data, size_t seek) {
 }
 
 int Ssd::readData(void* buffer, size_t seek) {
-    if (offset + _blockSize > _size) {
+    if (seek + _blockSize > _size) {
         return FEOF;
     }
     fseek(filePtr, seek, SEEK_SET);
@@ -42,9 +46,9 @@ int Ssd::readData(void* buffer, size_t seek) {
     return SUCCESS;
 }
 
-size_t getReadCount() {
-	return _readCount;
+size_t Ssd::getReadCount() {
+    return _readCount;
 }
-size_t getWriteCount() {
-	return _writeCount;
+size_t Ssd::getWriteCount() {
+    return _writeCount;
 }
