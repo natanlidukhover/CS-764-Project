@@ -2,23 +2,28 @@
 #define SSD_H
 
 #include <cstdio>
-#include <cstdlib>
+#include <cstdint>  // For uint8_t
 
 class Ssd {
+public:
+    Ssd(const char* filename, size_t size, size_t pageSize);
+    ~Ssd();
+
+    // Updated method signatures
+    bool writeData(uint8_t data);
+    bool readData(uint8_t* buffer, size_t offset, size_t numPages);
+
+    size_t getReadCount() const;
+    size_t getWriteCount() const;
+
 private:
     FILE* filePtr;
     size_t _size;
-    size_t _readCount;   // read call counter
-    size_t _writeCount;  // write call counter
-    size_t _blockSize;   // most efficient IO unit
-public:
-    Ssd(const char* filename, size_t size, size_t blockSize);
-    ~Ssd();
-    int writeData(const void* data, size_t seek);
-    int readData(void* buffer, size_t offset);
+    size_t _pageSize;
+    size_t _sizeOccupied;
 
-    size_t getReadCount();
-    size_t getWriteCount();
+    size_t _readCount;  // read call counter
+    size_t _writeCount; // write call counter
 };
 
-#endif  // SSD_H
+#endif // SSD_H
