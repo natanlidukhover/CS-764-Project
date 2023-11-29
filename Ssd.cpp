@@ -1,15 +1,8 @@
 #include "Ssd.h"
+#include <cstdint>   // For uint8_t
+#include <stdexcept> 
 
-#include <cstdio>
-#include <cstring>
-#include <iostream>
-
-#include "defs.h"
-
-Ssd::Ssd(const char* filename, size_t size, size_t blockSize) : _size(size),
-                                                                _readCount(0),
-                                                                _writeCount(0),
-                                                                _blockSize(blockSize) {
+Ssd::Ssd(const char* filename, size_t size, size_t pageSize) : _size(size), _pageSize(pageSize), _sizeOccupied(0), _readCount(0), _writeCount(0) {
     filePtr = fopen(filename, "w+");
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
@@ -20,35 +13,45 @@ Ssd::~Ssd() {
     fclose(filePtr);
 }
 
-int Ssd::writeData(const void* data, size_t seek) {
-    if (seek + _blockSize > _size) {
-        return FEOF;
+bool Ssd::writeData(uint8_t data) {
+
+    if (_sizeOccupied + 1 > _size) {
+        return false;
     }
-    fseek(filePtr, seek, SEEK_SET);
-    size_t written = fwrite(data, 1, _blockSize, filePtr);
-    if (written != _blockSize) {
-        return FIO;
+
+    fseek(filePtr, _sizeOccupied, SEEK_SET);
+    size_t written = fwrite(&data, 1, 1, filePtr);
+    if (written != 1) {
+        return false;
     }
-    _writeCount++;
-    return SUCCESS;
+
+    _sizeOccupied += 1;
+
+    if (_sizeOccupied % _pageSize == 0) {
+        _writeCount++;
+    }
+
+    return true;
 }
 
-int Ssd::readData(void* buffer, size_t seek) {
-    if (seek + _blockSize > _size) {
-        return FEOF;
-    }
-    fseek(filePtr, seek, SEEK_SET);
-    size_t read = fread(buffer, 1, _blockSize, filePtr);
-    if (read != _blockSize) {
-        return FIO;
-    }
-    _readCount++;
-    return SUCCESS;
-}
+bool Ssd::readData(uint8_t* buffer, size_t offset, size_t numPages) {
+    uint8_t* bufferPtr = reinterpret_cast<uint8_t*>(buffer);
 
-size_t Ssd::getReadCount() {
-    return _readCount;
-}
-size_t Ssd::getWriteCount() {
-    return _writeCount;
+    for (size_t page = 0; page < numPages; ++page) {
+        if (offset + _pageSize > _sizeOccupied) {
+            break;
+        }
+
+        fseek(filePtr, offset, SEEK_SET);
+        size_t read = fread(bufferPtr, 1, _pageSize, filePtr);
+        if (read != _pageSize) {
+            break;
+        }
+
+        _readCount++;
+        offset += _pageSize;
+        bufferPtr += _pageSize;
+    }
+
+    return true;
 }
