@@ -62,19 +62,18 @@ bool ScanIterator::next ()
  * 
  * @param size Size of the file to be generated in bytes. Eg: To generate a file of 50KB will be 50*1024 as the size parameter
 */
-std::vector<int> ScanIterator::getParameters(int size) {
+std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
     std::vector<int> intVector;
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 9);
+    std::uniform_int_distribution<uint8_t> dis(0, 9);
 
-    int i = 0;
-    
-    while (i < size) {
+    // Generate random numbers until the vector reaches the specified total number of integers
+    for (int i = 0; i < numberOfIntegers; ++i) {
         int random_number = dis(gen);
-        intVector.push_back(random_number);  // Appending a random number
-        i++;
+        intVector.push_back(random_number); // Appending a random number
     }
+
     return intVector;
 }
 
