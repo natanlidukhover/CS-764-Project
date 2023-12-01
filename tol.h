@@ -35,24 +35,48 @@ public:
 	size_t getSize();
 };
 
+#define NT_INODE	(0)
+#define NT_LEAF		(1)
+#define NT_EMPTY	(2)
+#define NT_LINF		(3)
+#define NT_INF		(3)
+#define INV			(-1)
+
 class Node
 {
 	friend class TOL;
 	int index;
+	int nodeType;
 	uint8_t *key;
-	int ofc;
-	Node *lft, *rht, *pnt;
+	Run *r;
+	int ovc;
+
+	int winnerIndex;
+	int winnerNT;
+	uint8_t *winnerKey;
+	Run *winnerR;
+	int winnerOVC;
 };
 
+class ETable
+{
+public:
+	ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey = 0);
+	ETable(ETable _t);
+	~ETable();
+	size_t _NumRows, _NumCols, _RecordSize, _SortKey, _rowSize;
+};
 
 class TOL
 {
 	size_t numOfRun;
-	Node **nodeList;
+	Node *nodeList;
 	Run **runList;
-	Run *output
+	Run *output;
+	size_t numNodes;
+	ETable t;
 public:
-	TOL(size_t nor, Run **rl, Run *o);
+	TOL(size_t nor, Run **rl, Run *o, ETable _t);
 };
 
 
