@@ -13,12 +13,12 @@ public:
     bool writeData(uint8_t data);
     bool readData(uint8_t* buffer, size_t offset, size_t numPages);
 
-    size_t getReadCount() const;
-    size_t getWriteCount() const;
     int writeData(const void* data, size_t seek, size_t data_size);
     int readData(void* buffer, size_t offset);
     size_t _blockSize;   // most efficient IO unit
     size_t _dataSize; // size of data in bytes
+    size_t getReadCount();
+    size_t getWriteCount();
 
 private:
     FILE* filePtr;

@@ -12,15 +12,15 @@ SCRS=
 # headers and code sources
 HDRS=	defs.h \
 		Iterator.h Scan.h Filter.h Sort.h \
-		Dram.h Ssd.h Table.h
+		Dram.h Table.h tol.h Ssd.h
 SRCS=	defs.cpp Assert.cpp Test.cpp \
 		Iterator.cpp Scan.cpp Filter.cpp Sort.cpp \
-		Dram.cpp Ssd.cpp Table.cpp 
+		Dram.cpp Table.cpp tol.cpp Ssd.cpp
 
 # compilation targets
 OBJS=	defs.o Assert.o Test.o \
 		Iterator.o Scan.o Filter.o Sort.o \
-		Dram.o Ssd.o Table.o
+		Dram.o Table.o tol.o Ssd.o
 
 # RCS assists
 REV=-q -f

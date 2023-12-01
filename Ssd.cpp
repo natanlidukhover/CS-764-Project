@@ -85,3 +85,10 @@ int Ssd::readData(void* buffer, size_t seek) {
     _readCount++;
     return SUCCESS;
 }
+
+size_t Ssd::getReadCount() {
+	return _readCount;
+}
+size_t Ssd::getWriteCount() {
+	return _writeCount;
+}
