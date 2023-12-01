@@ -6,12 +6,13 @@
 #include "Dram.h"
 #include "defs.h"
 #include <iostream>
-
+#include "Ssd.h"
 using namespace std;
 int main(int argc, char* argv[]) {
     TRACE(true);
-	int data_size = 50 * 1024 * 1024; //in bytes
-	int rows = data_size/50 ;
+	size_t data_size = 100;//50MB=50 * 1024 * 1024; //in bytes
+	size_t row_size = 50;
+	size_t rows = data_size/row_size ;
 	Plan * const plan = new ScanPlan (data_size);
 	new SortPlan ( new FilterPlan ( new ScanPlan (data_size) ) );
 
@@ -45,8 +46,13 @@ int main(int argc, char* argv[]) {
 		}
 		cout << "\n";
 	}
-
-	
+	//for hdd pagesize is given by bandwidth * latency = 100*0.01
+	Ssd * const hdd = new Ssd("./data/testData.bin",(size_t)10*1024*1024*1024,1, data_size);
+	int offset = data_size + 1;
+	for(int i = 0; i < rows; i++)
+	{
+		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size),row_size);
+	}
 	// delete it;
 
 	// delete plan;

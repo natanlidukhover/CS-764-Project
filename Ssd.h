@@ -6,7 +6,7 @@
 
 class Ssd {
 public:
-    Ssd(const char* filename, size_t size, size_t pageSize);
+    Ssd(const char* filename, size_t size, size_t pageSize, size_t data_size);
     ~Ssd();
 
     // Updated method signatures
@@ -15,10 +15,14 @@ public:
 
     size_t getReadCount() const;
     size_t getWriteCount() const;
+    int writeData(const void* data, size_t seek, size_t data_size);
+    int readData(void* buffer, size_t offset);
+    size_t _blockSize;   // most efficient IO unit
+    size_t _dataSize; // size of data in bytes
 
 private:
     FILE* filePtr;
-    size_t _size;
+    size_t _size; //size of the storage source (hdd,ssd,etc)
     size_t _pageSize;
     size_t _sizeOccupied;
 
