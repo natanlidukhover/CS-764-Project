@@ -7,7 +7,6 @@
 using namespace std;
 Ssd::Ssd(const char* filename, size_t size, size_t pageSize, size_t data_size) : _size(size), _pageSize(pageSize), _sizeOccupied(0), _readCount(0), _writeCount(0), _dataSize(data_size) {
     filePtr = fopen(filename, "a+");
-    cout << "fileptr in consgrutor" << filePtr << "\n";
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
     }
@@ -62,20 +61,15 @@ bool Ssd::readData(uint8_t* buffer, size_t offset, size_t numPages) {
 
 
 int Ssd::writeData(const void* data, size_t seek, size_t data_size) {
-        cout << "filePtr top seek" << seek <<  " " << _pageSize << " " << _size <<  "\n";
-
     if (seek + _pageSize > _size) {
         return FEOF;
     }
-    cout << "filePtr" << filePtr << "\n";
     fseek(filePtr, seek, SEEK_SET);
     size_t written = fwrite(data, 1, data_size, filePtr);
-        cout << "written data size" << written << "\n";
-
     if (written != data_size) {
         return FIO;
     }
-    _writeCount = _writeCount + (data_size/_blockSize) + ((data_size%_blockSize==1));
+    _writeCount = _writeCount + (data_size/_pageSize) + ((data_size%_pageSize==1));
     return SUCCESS;
 }
 
