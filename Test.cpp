@@ -10,16 +10,41 @@
 using namespace std;
 int main(int argc, char* argv[]) {
     TRACE(true);
-	size_t data_size = 150;//50MB=50 * 1024 * 1024; //in bytes
+
+    // Default values
+   	size_t data_size = 150;//50MB=50 * 1024 * 1024; //in bytes
 	size_t row_size = 50;
+    std::string o_filename;
+
+    // Parse command-line arguments
+    for (int i = 1; i < argc; i += 2) {
+        if (strcmp(argv[i], "-c") == 0) {
+            data_size = std::stoi(argv[i + 1]);
+        } else if (strcmp(argv[i], "-s") == 0) {
+            row_size = std::stoi(argv[i + 1]);
+        } else if (strcmp(argv[i], "-o") == 0) {
+            o_filename = argv[i + 1];
+        } 
+		// else {
+        //     std::cerr << "Invalid option: " << argv[i] << std::endl;
+        //     return 1; // Return an error code
+        // }
+    }
+
+    // Print the values
+    std::cout << "Total number of records " << data_size << std::endl;
+    std::cout << "Size of one record" << row_size << std::endl;
+    std::cout << "Output_filename: " << o_filename << std::endl;
+
+
 	size_t rows = (data_size/row_size) + ((data_size % row_size) == 0 ? 0 : 1) ;
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (data_size));
 	vector<int> numbers = sc_it->run();
 	
-	Table tmp(rows, 3, 17);
-	int k = 0;
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < 50; j++) {
+	Table tmp(rows, 3, row_size/3);
+	size_t k = 0;
+	for (size_t i = 0; i < rows; i++) {
+		for (size_t j = 0; j < row_size; j++) {
 			tmp[i][j] = numbers[k++];
 			cout << (int)tmp[i][j];
 			cout << " ";
@@ -34,7 +59,7 @@ int main(int argc, char* argv[]) {
 
 	cout << "Sorted table" << "\n";
 	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < 50; j++) {
+		for (int j = 0; j < row_size; j++) {
 			cout << (int)tmp[i][j] << " ";
 		}
 		cout << "\n";
