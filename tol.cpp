@@ -6,13 +6,61 @@
 Storage::Storage(Ssd *storage, uint8_t *_d, size_t bs, size_t ss):blockSize(bs),
 	sourceSeek(ss), d(_d), s(storage)
 {
+	head = 0;
+	tail = 0;
 }
 
 Storage::~Storage()
 {
 }
 
-Run::Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t rs): runSize(rs)
+// edit these functions
+// Run::getNext should return next 1 row
+// Storage::getNext called by Run::getNext should fill up its buffer
+int Storage::getNext(size_t &actSze, size_t sze = 0)
+{
+	if (sze == 0)
+		sze = blockSize;
+	if (sze % blockSize)
+		return EINPARAM;
+	if (head >= tail)
+		return EEMPTY;
+	int i, data_read = 0, ret = SUCCESS;
+	for (i = head; i < tail && i < (head + sze); i += blockSize) {
+		if ((ret = s->readData(d + data_read,
+				srcSeek + i))) {
+			return ret;
+		}
+		data_read += blockSize;
+	}
+	head += data_read;
+	actSze = data_read;
+	return SUCCESS;
+}
+
+int Storage::setNext(size_t sze = 0)
+{
+	if (sze == 0)
+		sze = blockSize;
+	if (sze % blockSize)
+		return EINPARAM;
+	// TODO add code to check if space allocated for this run has got full
+	//if (tail >= runSize)
+	//	return EFULL;
+	int i, data_written = 0;
+	for (i = tail; i < (tail + sze); i += blockSize) {
+		if ((ret = s->writeData(d + data_written,
+				srcSeek + i))) {
+			return ret;
+		}
+		data_written += blockSize
+	}
+	tail += data_written;
+	return SUCCESS;
+}
+
+Run::Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t rs, size_t rowsze):
+	runSize(rs), rowSize(rowsze)
 {
 	head = 0;
 	tail = 0;
@@ -27,22 +75,29 @@ Run::~Run()
 // edit these functions
 // Run::getNext should return next 1 row
 // Storage::getNext called by Run::getNext should fill up its buffer
-int Run::getNext(size_t s = source.blockSize, size_t offset = 0)
+int Run::getNext(uint8_t *key)
 {
-	// think about how will data move from all levels and in the data structures
-	if (s % source.blockSize)
-		return EINPARAM;
-	if (head >= tail)
-		return EEMPTY;
-	int i, data_read = 0, ret = SUCCESS;
-	for (i = head; i < tail && i < (head + s); i += source.blockSize) {
-		if ((ret = source.s->readData(source.d + data_read,
-				srcSeek + i))) {
+	int ret;
+	if (head >= tail) {
+		int dataRead = 0;
+		if ((ret = source.getNext(dataRead, 0)) == SUCCESS) {
+			head = 0;
+			tail = dataRead;
+		} else {
 			return ret;
 		}
-		data_read += source.blockSize;
 	}
-	head += data_read;
+	key = &(source.d[head]);
+	head += rowSize;
+	//int i, data_read = 0, ret = SUCCESS;
+	//for (i = head; i < tail && i < (head + s); i += source.blockSize) {
+	//	if ((ret = source.s->readData(source.d + data_read,
+	//			srcSeek + i))) {
+	//		return ret;
+	//	}
+	//	data_read += source.blockSize;
+	//}
+	//head += data_read;
 	return SUCCESS;
 }
 
@@ -177,6 +232,7 @@ void TOL::cmpLeafNodes(Node &curr, Node &l, Node &r) {
 		curr.r = NULL;
 		curr.ovc = INV;
 
+		curr.winnerIndex = r.index;
 		curr.winnerNT = NT_INODE;
 		curr.winnerKey = r.key;
 		curr.winnerR = r.r;
@@ -187,6 +243,7 @@ void TOL::cmpLeafNodes(Node &curr, Node &l, Node &r) {
 		curr.r = NULL;
 		curr.ovc = INV;
 
+		curr.winnerIndex = l.index;
 		curr.winnerNT = NT_INODE;
 		curr.winnerKey = l.key;
 		curr.winnerR = l.r;
@@ -207,6 +264,7 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		curr.r = NULL;
 		curr.ovc = INV;
 
+		curr.winnerIndex = r.index;
 		curr.winnerNT = NT_INODE;
 		curr.winnerKey = r.key;
 		curr.winnerR = r.r;
@@ -217,6 +275,7 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		curr.r = NULL;
 		curr.ovc = INV;
 
+		curr.winnerIndex = l.index;
 		curr.winnerNT = NT_INODE;
 		curr.winnerKey = l.key;
 		curr.winnerR = l.r;
@@ -244,6 +303,7 @@ void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
 	else
 		cmpINodes(curr, l, r);
 }
+
 TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor), _t(t)
 {
 	if (nor > 256)
@@ -258,7 +318,7 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 	int lastLeaf = pow(2, tol_height) - 2;
 	for (int i = 0; i < (lastLeaf - firstLeaf); i++) {
 		int li = firstLeaf + i;
-		nodeList[li].index = i;
+		nodeList[li].index = li;
 		if (i > nor) {
 			nodeList[li].nodeType = NT_LINF;
 			nodeList[li].key = NULL;

@@ -2,7 +2,7 @@
 #define __TOL_H__
 
 #include "Ssd.h"
-#include "dram.h"
+#include "Dram.h"
 
 #define DRAM 0
 #define SSD 1
@@ -15,6 +15,8 @@ class Storage
 	uint8_t *d;
 	size_t srcSeek;
 	size_t blockSize;
+	size_t head;
+	size_t tail;
 	Storage(Ssd *storage, uint8_t *d, size_t bs, size_t ss);
 	~Storage();
 };
@@ -26,6 +28,7 @@ class Run
 	size_t runSize;
 	size_t head;
 	size_t tail;
+	size_t rowSize;
 public:
 	Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t rs);
 	~Run();
@@ -45,7 +48,7 @@ public:
 class Node
 {
 	friend class TOL;
-	int index;
+	int index;			// index of leaf node from which this run come from
 	int nodeType;
 	uint8_t *key;
 	Run *r;
