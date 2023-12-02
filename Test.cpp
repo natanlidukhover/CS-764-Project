@@ -10,16 +10,9 @@
 using namespace std;
 int main(int argc, char* argv[]) {
     TRACE(true);
-	size_t data_size = 50 * 3;//50MB=50 * 1024 * 1024; //in bytes
+	size_t data_size = 150;//50MB=50 * 1024 * 1024; //in bytes
 	size_t row_size = 50;
-	size_t rows = data_size/row_size ;
-	//Plan * const plan = new ScanPlan (data_size);
-	//new SortPlan ( new FilterPlan ( new ScanPlan (data_size) ) );
-
-	//Iterator * const it = plan->init ();
-	//it->run ();
-
-	//ScanPlan * const sc_plan = new ScanPlan (count);
+	size_t rows = (data_size/row_size) + ((data_size % row_size) == 0 ? 0 : 1) ;
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (data_size));
 	vector<int> numbers = sc_it->run();
 	
@@ -27,7 +20,7 @@ int main(int argc, char* argv[]) {
 	int k = 0;
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < 50; j++) {
-			tmp[i][j] = numbers[k++]; //Random(10);//n - i+j;
+			tmp[i][j] = numbers[k++];
 			cout << (int)tmp[i][j];
 			cout << " ";
 		}
@@ -53,9 +46,6 @@ int main(int argc, char* argv[]) {
 	{
 		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size),row_size);
 	}
-	// delete it;
-
-	// delete plan;
 
     return 0;
 }  // main

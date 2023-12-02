@@ -80,8 +80,12 @@ std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
  * @param numbers Vector of numbers to be written to file. The numbers are single digit numbers in the range of 1 to 10
  * @param filename The binary filename where the above vector numbers will be written
 */
-void ScanIterator::saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string& filename) {
-    std::ofstream outFile(filename, std::ios::binary | std::ios::ate);
+void ScanIterator::saveIntegersToBinaryFile(const std::vector<int>& numbers, const std::string& filename, bool isAppendOnly) {
+    //open the file in appendOnly mode or truncate mode based on the flag
+    std::ofstream outFile;
+    if(isAppendOnly) outFile.open(filename, std::ios::binary | std::ios::app);
+    else outFile.open(filename, std::ios::binary | std::ios::ate);
+
     if (!outFile) {
         std::cerr << "Could not open file: " << filename << std::endl;
         return;
@@ -100,8 +104,6 @@ void ScanIterator::saveIntegersToBinaryFile(const std::vector<int>& numbers, con
     }
 
 // Read vector of integers from file in binary format
-//TODO
-// use Row and Table class to store integers
 /**
  * Read vector of integers from file in binary format
  * 
@@ -116,7 +118,6 @@ vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename
     std::streamsize fileSize = inFile.tellg();
     TRACE(true);
     cout << "Size of input file is "<< fileSize << " bytes" << std::endl;
-
     //seekg used as ate mode moves it to end of file
     inFile.seekg(0, ios::beg);
     while(numberOfRecordsToRead > 0)
@@ -133,9 +134,28 @@ vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename
 vector<int> ScanIterator::run ()
 {
 	TRACE (true);
-    int countOfNumbers = this->_count;
-	std::vector<int> test = this->getParameters(countOfNumbers);
-    this->saveIntegersToBinaryFile(test, this->file);
+    size_t countOfNumbers = this->_count;
+    //generate chunkSize bytes of random data at a time and write it to file
+    size_t chunkSize = 50;
+    size_t chunks = countOfNumbers/chunkSize;
+    cout << "Number of chunks to write: " << chunks << "each having size" << chunkSize << "\n";
+    for(int i = 0; i < chunks; i++)
+    {
+        std::vector<int> currChunk = this->getParameters(chunkSize);
+        // open the file in truncate mode for the first chunk and then open it in append mode
+        // Hence we pass a flag isAppendOnly whose vaue is i which will be false when it is the first run(i=0)
+        this->saveIntegersToBinaryFile(currChunk, this->file, i);
+        if(i % 10 == 0){
+            cout << "Written" << i * chunkSize <<"bytes to the file " << this->file << "\n";
+        }    
+    }
+    size_t remaining = countOfNumbers % chunkSize;
+    if(remaining != 0)
+    {
+        std::vector<int> remainingChunk = this->getParameters(remaining);
+        this->saveIntegersToBinaryFile(remainingChunk, this->file, chunks > 0);
+    }
+	
     vector<int> numbers = readIntegersFromBinaryFile(this->file, 1, countOfNumbers);
     return numbers;
 } // ScanIterator::next

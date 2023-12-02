@@ -25,7 +25,7 @@ public:
 	bool next ();
 	vector<int> run();
 	std::vector<int> getParameters(int size);
-	void saveIntegersToBinaryFile(const std::vector<int>& numbers, const string& filename) ;
+	void saveIntegersToBinaryFile(const std::vector<int>& numbers, const string& filename, bool isAppendOnly) ;
 	vector<int> readIntegersFromBinaryFile(const std::string& filename, int recordSize, int numberOfRecordsToRead) ;
 private:
 	ScanPlan const * const _plan;
