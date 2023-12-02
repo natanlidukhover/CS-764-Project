@@ -304,6 +304,18 @@ void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
 		cmpINodes(curr, l, r);
 }
 
+TOL::pass() {
+	// Set next key in the root winner's run to be the value at that run's leaf
+	int leafIndex = nodeList[0].winnerIndex;
+	nodeList[leafIndex] = nodeList[0].winnerR->getNext();
+	// Compare the children of the current node where current node is the parent of the updated leaf all the way up the tree
+	int parentNodeIndex = (leafIndex - 1) / 2;
+	while (parentNodeIndex >= 0) {
+		cmpNodes(nodeList[parentNodeIndex], nodeList[2 * parentNodeIndex + 1], nodeList[2 * parentNodeIndex + 2]);
+		parentNodeIndex = (parentNodeIndex - 1) / 2;
+	}
+}
+
 TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor), _t(t)
 {
 	if (nor > 256)
