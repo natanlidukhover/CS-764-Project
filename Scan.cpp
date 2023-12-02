@@ -30,13 +30,9 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	_plan (plan), _count (plan->_count)
 {
 	TRACE (true);
-    // numbers to generate
-    // int countOfNumbers = 10;
-	// std::vector<int> test = getParameters(countOfNumbers);
-    // string file = "./data/testData.bin";
-    // saveIntegersToBinaryFile(test, file);
-    // vector<int> numbers = readIntegersFromBinaryFile(file, 1, countOfNumbers/5);
-    // for(auto i : numbers) cout << i << " ";
+
+    this->file = "./data/testData.bin";
+    cout << "Random data will be written to the file ./data/testData.bin" << "\n";
 } // ScanIterator::ScanIterator
 
 ScanIterator::~ScanIterator ()
@@ -63,6 +59,7 @@ bool ScanIterator::next ()
  * @param size Size of the file to be generated in bytes. Eg: To generate a file of 50KB will be 50*1024 as the size parameter
 */
 std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
+    TRACE(true);
     std::vector<int> intVector;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -73,7 +70,7 @@ std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
         int random_number = dis(gen);
         intVector.push_back(random_number); // Appending a random number
     }
-
+    cout << "Generated " << numberOfIntegers << " bytes of random data\n";
     return intVector;
 }
 
@@ -97,6 +94,7 @@ void ScanIterator::saveIntegersToBinaryFile(const std::vector<int>& numbers, con
     outFile.close();
     std::ifstream inFile(filename, std::ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
+    TRACE(true);
     cout << fileSize << " bytes written to file" << filename << std::endl;
     inFile.close();
     }
@@ -116,6 +114,7 @@ vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename
     vector<int> res;
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
+    TRACE(true);
     cout << "Size of input file is "<< fileSize << " bytes" << std::endl;
 
     //seekg used as ate mode moves it to end of file
@@ -136,9 +135,7 @@ vector<int> ScanIterator::run ()
 	TRACE (true);
     int countOfNumbers = this->_count;
 	std::vector<int> test = this->getParameters(countOfNumbers);
-    string file = "./data/testData.bin";
-    this->saveIntegersToBinaryFile(test, file);
-    vector<int> numbers = readIntegersFromBinaryFile(file, 1, countOfNumbers);
+    this->saveIntegersToBinaryFile(test, this->file);
+    vector<int> numbers = readIntegersFromBinaryFile(this->file, 1, countOfNumbers);
     return numbers;
-	//++ _count;
 } // ScanIterator::next

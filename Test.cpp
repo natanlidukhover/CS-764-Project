@@ -10,14 +10,14 @@
 using namespace std;
 int main(int argc, char* argv[]) {
     TRACE(true);
-	size_t data_size = 50 * 1024 * 1024;//50MB=50 * 1024 * 1024; //in bytes
+	size_t data_size = 50 * 3;//50MB=50 * 1024 * 1024; //in bytes
 	size_t row_size = 50;
 	size_t rows = data_size/row_size ;
-	Plan * const plan = new ScanPlan (data_size);
-	new SortPlan ( new FilterPlan ( new ScanPlan (data_size) ) );
+	//Plan * const plan = new ScanPlan (data_size);
+	//new SortPlan ( new FilterPlan ( new ScanPlan (data_size) ) );
 
-	Iterator * const it = plan->init ();
-	it->run ();
+	//Iterator * const it = plan->init ();
+	//it->run ();
 
 	//ScanPlan * const sc_plan = new ScanPlan (count);
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (data_size));

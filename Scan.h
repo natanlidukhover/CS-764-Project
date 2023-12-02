@@ -21,6 +21,7 @@ class ScanIterator : public Iterator
 public:
 	ScanIterator (ScanPlan const * const plan);
 	~ScanIterator ();
+	string file;
 	bool next ();
 	vector<int> run();
 	std::vector<int> getParameters(int size);
