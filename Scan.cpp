@@ -31,7 +31,7 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 {
 	TRACE (true);
 
-    this->file = "./data/testData.bin";
+    this->file = "./input/testData.bin";
     cout << "Random data will be written to the file ./data/testData.bin" << "\n";
 } // ScanIterator::ScanIterator
 
