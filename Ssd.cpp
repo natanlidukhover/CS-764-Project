@@ -5,7 +5,9 @@
 #include<stdio.h>
 #include <iostream>
 using namespace std;
-Ssd::Ssd(const char* filename, size_t size, size_t pageSize, size_t data_size) : _size(size), _pageSize(pageSize), _sizeOccupied(0), _readCount(0), _writeCount(0), _dataSize(data_size) {
+Ssd::Ssd(const char* filename, size_t size, size_t pageSize, size_t data_size) :
+	_size(size), _pageSize(pageSize), _sizeOccupied(0), _readCount(0),
+	_writeCount(0), _blockSize(pageSize), _dataSize(data_size) {
     filePtr = fopen(filename, "a+");
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
@@ -65,7 +67,11 @@ int Ssd::writeData(const void* data, size_t seek, size_t data_size) {
         return FEOF;
     }
     fseek(filePtr, seek, SEEK_SET);
-    size_t written = fwrite(data, 1, data_size, filePtr);
+	size_t numBlockToWrite = (data_size/_pageSize) + ((data_size%_pageSize==1));
+    size_t written = 0;
+	for (size_t i = 0; i < numBlockToWrite; i++) {
+		written += fwrite(data, 1, data_size, filePtr);
+	}
     if (written != data_size) {
         return FIO;
     }

@@ -88,11 +88,11 @@ int Storage::setNext(size_t sze = 0)
 
     size_t data_written = 0;
 	int ret = SUCCESS;
-    for (size_t i = tail; i < runSize && i < ((size_t) tail + s); i += source->blockSize) {
-        if (ret == source->s->writeData(source->d + data_written, srcSeek + i)) {
+    for (size_t i = tail; i < (tail + sze); i += blockSize) {
+        if (ret == s->writeData(d + data_written, srcSeek + i, blockSize)) {
             return ret;
         }
-        data_written += source->blockSize;
+        data_written += blockSize;
     }
 
     tail += data_written;
@@ -142,7 +142,6 @@ size_t Run::getSize()
     return runSize;
 }
 
-=======
 ETable::ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey
 		= 0):_NumRows(NumRows), _NumCols(NumCols), _RecordSize(RecordSize),
 	_SortKey(SortKey)

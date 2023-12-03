@@ -15,8 +15,6 @@ public:
 
     int writeData(const void* data, size_t seek, size_t data_size);
     int readData(void* buffer, size_t offset);
-    size_t _blockSize;   // most efficient IO unit
-    size_t _dataSize; // size of data in bytes
     size_t getReadCount();
     size_t getWriteCount();
 
@@ -28,6 +26,8 @@ private:
 
     size_t _readCount;  // read call counter
     size_t _writeCount; // write call counter
+    size_t _blockSize;   // most efficient IO unit
+    size_t _dataSize; // size of data in bytes
 };
 
 #endif // SSD_H
