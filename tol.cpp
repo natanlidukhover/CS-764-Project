@@ -1,7 +1,8 @@
 #include "defs.h"
 #include "tol.h"
-#include <math.h>
 #include <cmath>
+#include <math.h>
+#include <stdexcept>
 
 Storage::Storage(Ssd *storage, uint8_t *_d, size_t bs, size_t ss):blockSize(bs),
 	sourceSeek(ss), d(_d), s(storage)
@@ -17,7 +18,7 @@ Storage::~Storage()
 // edit these functions
 // Run::getNext should return next 1 row
 // Storage::getNext called by Run::getNext should fill up its buffer
-int Storage::getNext(size_t &actSze, size_t sze = 0)
+uint8_t Storage::getNext(size_t &actSze, size_t sze = 0)
 {
 	if (sze == 0)
 		sze = blockSize;
@@ -75,7 +76,7 @@ Run::~Run()
 // edit these functions
 // Run::getNext should return next 1 row
 // Storage::getNext called by Run::getNext should fill up its buffer
-int Run::getNext(uint8_t *key)
+uint8_t Run::getNext(uint8_t *key)
 {
 	int ret;
 	if (head >= tail) {
@@ -135,7 +136,7 @@ ETable::ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey
 {
 }
 
-ETable::ETable(ETable _t)
+ETable::ETable(const ETable &_t)
 {
 	_NumRows = _t._NumRows;
 	_NumCols = _t._NumCols;
@@ -155,7 +156,7 @@ void TOL::setWinner(Node &curr, Node &n) {
 	curr.winnerOVC = n.ovc;
 }
 
-void TOL::setLooser(Node &curr, Node &n) {
+void TOL::setLoser(Node &curr, Node &n) {
 	curr.index = n.index;
 	curr.nodeType = n.nodeType;
 	curr.key = n.key;
@@ -166,18 +167,17 @@ void TOL::setLooser(Node &curr, Node &n) {
 /**
  * Its assume that none of curr, l and r is INF or EMPTY node
 */
-void TOL::calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10,
-		size_t arity = t._rowSize, bool isAscending = true) {
+void TOL::calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10, size_t arity = t._rowSize, bool isAscending = true) {
 	// TODO compare using OVC
 	if (l.ovc != INV && r.ovc != INV) {
 		if (l.ovc != r.ovc) {
 			// TODO check if these conditions are correct
 			if (l.ovc < r.ovc) {
 				setWinner(curr, l);
-				setLooser(curr, r);
+				setLoser(curr, r);
 			} else {
 				setWinner(curr, r);
-				setLooser(curr, l);
+				setLoser(curr, l);
 			}
 			curr.nodeType = NT_INODE;
 			return;
@@ -194,11 +194,11 @@ void TOL::calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10,
 			if (currentRow[i] < prevRow[i]) {
 				value = prevRow[i];
 				setWinner(curr, r);
-				setLooser(curr, l);
+				setLoser(curr, l);
 			} else {
 				value = currentRow[i];
 				setWinner(curr, l);
-				setLooser(curr, r);
+				setLoser(curr, r);
 			}
 			curr.nodeType = NT_INODE;
 			break;
@@ -252,6 +252,7 @@ void TOL::cmpLeafNodes(Node &curr, Node &l, Node &r) {
 		calculateLeafWinner(curr, l, r);
 	}
 }
+
 void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 	if (l.nodeType == NT_INF && r.nodeType == NT_INF) {
 		curr.nodeType = curr.winnerNT = NT_INF;
@@ -284,9 +285,10 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		calculateLeafWinner(curr, l, r);
 	}
 }
+
 void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
 	// cmp lc and rc, save winner in current node winnerKey and winnerR
-	// save looser in current node key and r
+	// save loser in current node key and r
 	// update ovc in looser node wrt to winner
 	// How to cmp?
 	// if leaf node - if both are inf then win is inf, los is inf,
@@ -304,7 +306,7 @@ void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
 		cmpINodes(curr, l, r);
 }
 
-TOL::pass() {
+void TOL::pass() {
 	// Set next key in the root winner's run to be the value at that run's leaf
 	int leafIndex = nodeList[0].winnerIndex;
 	nodeList[leafIndex] = nodeList[0].winnerR->getNext();
@@ -316,8 +318,7 @@ TOL::pass() {
 	}
 }
 
-TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor), _t(t)
-{
+TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor), t(_t) {
 	if (nor > 256)
 		throw std::runtime_error("TOL doesn't fit in cache");
 
@@ -380,7 +381,6 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 	}
 }
 
-TOL::~TOL()
-{
+TOL::~TOL() {
 	delete[] nodeList;
 }

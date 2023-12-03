@@ -32,8 +32,8 @@ class Run
 public:
 	Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t rs);
 	~Run();
-	int getNext(size_t s = source.blockSize, size_t offset);// SSD/HDD to DRAM
-	int setNext(size_t s = source.blockSize, size_t offset);// DRAM to SSD/HDD
+	uint8_t getNext(size_t s = source.blockSize, size_t offset);// SSD/HDD to DRAM
+	uint8_t setNext(size_t s = source.blockSize, size_t offset);// DRAM to SSD/HDD
 	uint8_t *getBuf();										// Get DRAM buffer
 	size_t getSize();
 };
@@ -65,19 +65,26 @@ class ETable
 {
 public:
 	ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey = 0);
-	ETable(ETable _t);
+	ETable(ETable &_t);
 	~ETable();
 	size_t _NumRows, _NumCols, _RecordSize, _SortKey, _rowSize;
 };
 
-class TOL
-{
+class TOL {
 	size_t numOfRun;
 	Node *nodeList;
 	Run **runList;
 	Run *output;
 	size_t numNodes;
 	ETable t;
+private:
+	void setWinner(Node &curr, Node &n);
+	void setLoser(Node &curr, Node &n);
+	void calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10, size_t arity = t._rowSize, bool isAscending = true);
+	void cmpLeafNodes(Node &curr, Node &l, Node &r);
+	void cmpINodes(Node &curr, Node &l, Node &r);
+	void cmpNodes(Node &curr, Node &l, Node &r);
+	void pass();
 public:
 	TOL(size_t nor, Run **rl, Run *o, ETable _t);
 };
