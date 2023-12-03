@@ -58,8 +58,8 @@ int main(int argc, char* argv[]) {
 	verifySortedRuns(tmp, 0, rows - 1, sort_col);
 
 	cout << "Sorted table" << "\n";
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < row_size; j++) {
+	for (size_t i = 0; i < rows; i++) {
+		for (size_t j = 0; j < row_size; j++) {
 			cout << (int)tmp[i][j] << " ";
 		}
 		cout << "\n";

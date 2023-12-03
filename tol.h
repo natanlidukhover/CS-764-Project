@@ -10,49 +10,92 @@
 #define SSD 1
 #define HDD 2
 
-class Storage {
-    friend class Run;
-    size_t blockSize;
-    size_t srcSeek;
-    uint8_t* d;
-    Ssd* s;
-    Storage(Ssd* storage, uint8_t* d, size_t bs, size_t ss);
-    ~Storage();
-};
-
-class Run {
-    friend class TOL;
-    Storage* source;
-    size_t runSize;
-    size_t head;
-    size_t tail;
-
+class Storage
+{
+	friend class Run;
+	size_t blockSize;				// optimal block size for SSD/HDD
+	size_t srcSeek;					// seek in SSD/HDD where run starts
+	uint8_t *d;						// pointer to DRAM buffer
+	Ssd *s;							// pointer to SSD/HDD object
+	size_t tail;					// tail of run queue in SSD/HDD
+	size_t maxSize;					// maximum run queue size
+	size_t head;					// head of run queue in SSD/HDD
 public:
-    Run(Ssd* _s, uint8_t* _d, size_t bs, size_t ss, size_t rs);
-    ~Run();
-    int getNext(size_t s, size_t offset, size_t srcSeek);  // SSD/HDD to DRAM
-    int setNext(size_t s, size_t offset, size_t srcSeek);  // DRAM to SSD/HDD
-    uint8_t* getBuf();                                     // Get DRAM buffer
-    size_t getSize();
+	Storage(Ssd *storage, uint8_t *_d, size_t bs, size_t ss, size_t t, size_t ms);
+	~Storage();
+	int getNext(size_t &actSze, size_t sze);
+	int setNext(size_t sze);
 };
 
-class Node {
-    friend class TOL;
-    int index;
-    uint8_t* key;
-    int ofc;
-    Node *lft, *rht, *pnt;
+class Run
+{
+	friend class TOL;
+	Storage *source;
+	size_t runSize;
+	size_t head;
+	size_t tail;
+	size_t rowSize;
+	size_t bufferSize;
+public:
+	Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t t, size_t ms,
+		size_t brs, size_t rowsze);
+	~Run();
+	int getNext(uint8_t **key);
+	int setNext(uint8_t *key);
+	uint8_t *getBuf();										// Get DRAM buffer
+	size_t getSize();
+};
+
+#define NT_INODE	(0)
+#define NT_LEAF		(1)
+#define NT_EMPTY	(2)
+#define NT_LINF		(3)
+#define NT_INF		(3)
+#define INV			(-1)
+
+class Node
+{
+	friend class TOL;
+	int index;			// index of leaf node from which this run come from
+	int nodeType;
+	uint8_t *key;
+	Run *r;
+	int ovc;
+
+	int winnerIndex;
+	int winnerNT;
+	uint8_t *winnerKey;
+	Run *winnerR;
+	int winnerOVC;
+};
+
+class ETable
+{
+public:
+	ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey);
+	ETable(const ETable &_t);
+	~ETable();
+	size_t _NumRows, _NumCols, _RecordSize, _SortKey, _rowSize;
 };
 
 class TOL {
-    Node** nodeList;
-    Run** runList;
-    Run* output;
-    size_t numOfRun;
-	int tol_height;
-
+	Run **runList;
+	Run *output;
+	size_t numOfRun;
+	ETable t;
+	Node *nodeList;
+	size_t numNodes;
+private:
+	void setWinner(Node &curr, Node &n);
+	void setLoser(Node &curr, Node &n);
+	void calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain, size_t arity, bool isAscending);
+	void cmpLeafNodes(Node &curr, Node &l, Node &r);
+	void cmpINodes(Node &curr, Node &l, Node &r);
+	void cmpNodes(Node &curr, Node &l, Node &r);
+	void pass();
 public:
-    TOL(size_t nor, Run** rl, Run* o);
+	TOL(size_t nor, Run **rl, Run *o, ETable _t);
+	~TOL();
 };
 
 // Leaf: Should have info about where to get next part of run

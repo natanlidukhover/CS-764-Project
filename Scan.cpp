@@ -139,7 +139,7 @@ vector<int> ScanIterator::run ()
     size_t chunkSize = 50;
     size_t chunks = countOfNumbers/chunkSize;
     cout << "Number of chunks to write: " << chunks << "each having size" << chunkSize << "\n";
-    for(int i = 0; i < chunks; i++)
+    for(size_t i = 0; i < chunks; i++)
     {
         std::vector<int> currChunk = this->getParameters(chunkSize);
         // open the file in truncate mode for the first chunk and then open it in append mode
