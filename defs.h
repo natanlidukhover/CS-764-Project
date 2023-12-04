@@ -41,6 +41,7 @@ void Assert (bool const predicate,
 #define EINPARM (3)
 #define EEMPTY	(4)
 #define EFULL	(5)
+#define EINF    (6)
 
 
 // -----------------------------------------------------------------
