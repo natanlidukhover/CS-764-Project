@@ -323,7 +323,14 @@ void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
 void TOL::pass() {
 	// Set next key in the root winner's run to be the value at that run's leaf
 	int leafIndex = nodeList[0].winnerIndex;
-	nodeList[0].winnerR->getNext(&(nodeList[leafIndex].key));
+	int ret = (nodeList[0].winnerR)->getNext(&nodeList[leafIndex].key);
+	if (ret != SUCCESS) {
+		// If the run is exhausted, the leaf node should be infinite
+		nodeList[leafIndex].nodeType = NT_LINF;
+		nodeList[leafIndex].key = NULL;
+		nodeList[leafIndex].r = NULL;
+		nodeList[leafIndex].ovc = INV;
+	}
 	// Compare the children of the current node where current node is the parent of the updated leaf all the way up the tree
 	int parentNodeIndex = (leafIndex - 1) / 2;
 	while (parentNodeIndex >= 0) {
