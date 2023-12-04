@@ -1,3 +1,4 @@
 *.o
 *.exe
 *.json
+input/testData.bin
