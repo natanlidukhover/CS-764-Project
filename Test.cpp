@@ -14,8 +14,8 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
     // Default values
-   	size_t data_size = 12;//50MB=50 * 1024 * 1024; //in bytes
-	size_t row_size = 4;
+   	size_t data_size = 24;//50MB=50 * 1024 * 1024; //in bytes
+	size_t row_size = 6;
     std::string o_filename="o.txt";
 
     // Parse command-line arguments
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 	size_t offset = data_size + 1;
 	for(size_t i = 0; i < rows; i++)
 	{
-		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size),row_size);
+		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size), row_size);
 	}
 	//hdd->writeData(tmp, offset);
     return 0;

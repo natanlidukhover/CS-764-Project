@@ -67,25 +67,22 @@ bool Ssd::readData(uint8_t* buffer, size_t offset, size_t numPages) {
 
 
 
-int Ssd::writeData(const void* data, size_t seek, size_t data_size) {
+int Ssd::writeData(const void* data, size_t seek, size_t rowSize) {
     TRACE(true, outTrace);
 
-    if (seek + _pageSize > _size) {
-        cout << "Found less size to write, hence exiting.Offset seek:" << seek << " PageSize:" << _pageSize << " Size of storage" << _size << "DataSize" << data_size << endl;  
+    if (seek + _blockSize > _size) {
+        cout << "Found less size to write, hence exiting.Offset seek:" << seek << " PageSize:" << _blockSize << " Size of storage" << _size << endl;  
         return FEOF;
     }
-    cout << "Offset seek:" << seek << " PageSize:" << _pageSize << " Size of storage " << _size << " DataSize" << data_size << endl;  
+    cout << "Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage " << _size << endl;  
     fseek(filePtr, seek, SEEK_SET);
-	size_t numBlockToWrite = (data_size/_pageSize) + ((data_size%_pageSize==1));
     size_t written = 0;
-    cout << "Blocks to write " << numBlockToWrite << " Seek pointer" << seek << endl;
-	for (size_t i = 0; i < numBlockToWrite; i++) {
-		written += fwrite(data, 1, data_size, filePtr);
-	}
-    if (written != data_size) {
+	written += fwrite(data, 1, rowSize, filePtr);
+	
+    if (written != _blockSize) {
         return FIO;
     }
-    _writeCount = _writeCount + (data_size/_pageSize) + ((data_size%_pageSize==1));
+    _writeCount = _writeCount + 1;
     return SUCCESS;
 }
 
