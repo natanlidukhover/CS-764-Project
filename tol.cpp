@@ -83,7 +83,7 @@ int Storage::setNext(size_t sze = 0)
 		sze = blockSize;
 	if (sze % blockSize)
 		return EINPARM;
-	if (tail + sze >= maxSize)
+	if (tail + sze > maxSize)
 		return EFULL;
 
     size_t data_written = 0;
@@ -119,7 +119,7 @@ int Run::getNext(uint8_t **key)
 int Run::setNext(uint8_t *key)
 {
 	int ret;
-	if (tail + rowSize >= runSize) {
+	if (tail + rowSize > runSize) {
 		if((ret = source->setNext(runSize)) == SUCCESS) {
 			head = 0;
 			tail = 0;
@@ -394,7 +394,7 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 		// init all nodes at each height
 		int firstNode = pow(2, i - 1) - 1;
 		int lastNode = pow(2, i) - 2;
-		for (int j = 0; j < (lastNode - firstNode); j++) {
+		for (int j = 0; j <= (lastNode - firstNode); j++) {
 			int ni = firstNode + j;
 			int lc = 2 * ni + 1;
 			int rc = 2 * ni + 2;
