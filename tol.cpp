@@ -320,10 +320,19 @@ void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
 		cmpINodes(curr, l, r);
 }
 
-void TOL::pass() {
+int TOL::pass() {
+	// Check for infinite case
+	if (nodeList[0].nodeType == NT_INF) {
+		return EINF;
+	}
+	// Store current winner
+	int ret = output->setNext(nodeList[0].key);
+	if (ret != SUCCESS) {
+		return ret;
+	}
 	// Set next key in the root winner's run to be the value at that run's leaf
 	int leafIndex = nodeList[0].winnerIndex;
-	int ret = (nodeList[0].winnerR)->getNext(&nodeList[leafIndex].key);
+	ret = (nodeList[0].winnerR)->getNext(&nodeList[leafIndex].key);
 	if (ret != SUCCESS) {
 		// If the run is exhausted, the leaf node should be infinite
 		nodeList[leafIndex].nodeType = NT_LINF;
@@ -337,6 +346,7 @@ void TOL::pass() {
 		cmpNodes(nodeList[parentNodeIndex], nodeList[2 * parentNodeIndex + 1], nodeList[2 * parentNodeIndex + 2]);
 		parentNodeIndex = (parentNodeIndex - 1) / 2;
 	}
+	return SUCCESS;
 }
 
 TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor), t(_t) {

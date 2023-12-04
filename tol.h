@@ -92,7 +92,7 @@ private:
 	void cmpLeafNodes(Node &curr, Node &l, Node &r);
 	void cmpINodes(Node &curr, Node &l, Node &r);
 	void cmpNodes(Node &curr, Node &l, Node &r);
-	void pass();
+	int pass();
 public:
 	TOL(size_t nor, Run **rl, Run *o, ETable _t);
 	~TOL();
