@@ -7,7 +7,7 @@ class ScanPlan : public Plan
 {
 	friend class ScanIterator;
 public:
-	ScanPlan (RowCount const count);
+	ScanPlan (RowCount const count, ofstream  &outputStream);
 	~ScanPlan ();
 	Iterator * init () const;
 	//cannot add below line due to cyclic dependency
@@ -19,6 +19,7 @@ private:
 class ScanIterator : public Iterator
 {
 public:
+	ScanIterator (ScanPlan const * const plan, ofstream  &outputStream);
 	ScanIterator (ScanPlan const * const plan);
 	~ScanIterator ();
 	string file;

@@ -4,10 +4,14 @@
 #include "defs.h"
 #include<stdio.h>
 #include <iostream>
+#include "Table.h"
+#define cout outTrace
+
 using namespace std;
-Ssd::Ssd(const char* filename, size_t size, size_t pageSize, size_t data_size) :
+Ssd::Ssd(const char* filename, size_t size, size_t pageSize, size_t data_size, ofstream  &outputStream) :
 	_size(size), _pageSize(pageSize), _sizeOccupied(0), _readCount(0),
-	_writeCount(0), _blockSize(pageSize), _dataSize(data_size) {
+	_writeCount(0), _blockSize(pageSize), _dataSize(data_size), outTrace(outputStream) {
+    TRACE(true, outTrace);
     filePtr = fopen(filename, "a+");
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
@@ -62,13 +66,19 @@ bool Ssd::readData(uint8_t* buffer, size_t offset, size_t numPages) {
 }
 
 
+
 int Ssd::writeData(const void* data, size_t seek, size_t data_size) {
+    TRACE(true, outTrace);
+
     if (seek + _pageSize > _size) {
+        cout << "Found less size to write, hence exiting.Offset seek:" << seek << " PageSize:" << _pageSize << " Size of storage" << _size << "DataSize" << data_size << endl;  
         return FEOF;
     }
+    cout << "Offset seek:" << seek << " PageSize:" << _pageSize << " Size of storage " << _size << " DataSize" << data_size << endl;  
     fseek(filePtr, seek, SEEK_SET);
 	size_t numBlockToWrite = (data_size/_pageSize) + ((data_size%_pageSize==1));
     size_t written = 0;
+    cout << "Blocks to write " << numBlockToWrite << " Seek pointer" << seek << endl;
 	for (size_t i = 0; i < numBlockToWrite; i++) {
 		written += fwrite(data, 1, data_size, filePtr);
 	}
@@ -76,6 +86,42 @@ int Ssd::writeData(const void* data, size_t seek, size_t data_size) {
         return FIO;
     }
     _writeCount = _writeCount + (data_size/_pageSize) + ((data_size%_pageSize==1));
+    return SUCCESS;
+}
+
+int Ssd::writeData(Table data, size_t offset)
+{
+    TRACE(true, outTrace);
+    if (offset + _pageSize > _size) {
+        cout << "Found less size to write, hence exiting.Offset:" << offset << " PageSize:" << _pageSize << " Size of storage" << _size <<  endl;  
+        return FEOF;
+    }
+    cout << "Offset :" << offset << " PageSize:" << _pageSize << " Size of storage " << _size << endl;  
+    fseek(filePtr, offset, SEEK_SET);
+	// size_t numBlockToWrite = (data_size/_pageSize) + ((data_size%_pageSize==1));
+    // size_t written = 0;
+    // cout << "Blocks to write " << numBlockToWrite << " Seek pointer" << seek << endl;
+    // for (size_t i = 0; i < numBlockToWrite; i++) {
+	// 	written += fwrite(data, 1, data_size, filePtr);
+	// }
+    // if (written != data_size) {
+    //     return FIO;
+    // }
+    // _writeCount = _writeCount + (data_size/_pageSize) + ((data_size%_pageSize==1));
+    // return SUCCESS;
+    size_t written = 0;
+    cout << data._NumRows << " " << data._rowSize << endl;
+    for(size_t i = 0; i < data._NumRows; i++)
+	{
+		//cout << "Row number " << i  << " " << offset + i*(row_size) << " " << row_size << endl;
+		// hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size),row_size);
+        written += fwrite(data[i], 1, data._rowSize, filePtr);
+	}
+    if (written != data._rowSize) {
+        cout << "Written data not equal to rowSize";
+        //return FIO;
+    }
+    //_writeCount = _writeCount + (data_size/_pageSize) + ((data_size%_pageSize==1));
     return SUCCESS;
 }
 
