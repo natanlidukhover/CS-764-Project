@@ -89,7 +89,7 @@ int Storage::setNext(size_t sze = 0)
     size_t data_written = 0;
 	int ret = SUCCESS;
     for (size_t i = tail; i < (tail + sze); i += blockSize) {
-        if (ret == s->writeData(d + data_written, srcSeek + i, blockSize)) {
+        if (ret == s->writeData(d + data_written, srcSeek + i)) {
             return ret;
         }
         data_written += blockSize;

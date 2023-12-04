@@ -67,7 +67,7 @@ bool Ssd::readData(uint8_t* buffer, size_t offset, size_t numPages) {
 
 
 
-int Ssd::writeData(const void* data, size_t seek, size_t rowSize) {
+int Ssd::writeData(const void* data, size_t seek) {
     TRACE(true, outTrace);
 
     if (seek + _blockSize > _size) {
@@ -77,7 +77,7 @@ int Ssd::writeData(const void* data, size_t seek, size_t rowSize) {
     cout << "Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage " << _size << endl;  
     fseek(filePtr, seek, SEEK_SET);
     size_t written = 0;
-	written += fwrite(data, 1, rowSize, filePtr);
+	written += fwrite(data, 1, _blockSize, filePtr);
 	
     if (written != _blockSize) {
         return FIO;

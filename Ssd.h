@@ -15,7 +15,7 @@ public:
     bool writeData(uint8_t data);
     bool readData(uint8_t* buffer, size_t offset, size_t numPages);
 
-    int writeData(const void* data, size_t seek, size_t row_size);
+    int writeData(const void* data, size_t seek);
     int writeData(Table data, size_t offset);
     int readData(void* buffer, size_t offset);
     size_t getReadCount();
