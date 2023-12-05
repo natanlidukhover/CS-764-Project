@@ -11,26 +11,26 @@ using namespace std;
 #define cout outTrace
 
 
-ScanPlan::ScanPlan (RowCount const count, ofstream &outputStream) : _count (count), Plan(outputStream)
+ScanPlan::ScanPlan (RowCount const count, ofstream &outputStream) : _count (count)
 {
-	TRACE (true, outTrace);
+	TRACE (true);
 } // ScanPlan::ScanPlan
 
 ScanPlan::~ScanPlan ()
 {
-	TRACE (true,outTrace);
+	    TRACE(true);
 } // ScanPlan::~ScanPlan
 
 Iterator * ScanPlan::init () const
 {
-	TRACE (true,outTrace);
+	    TRACE(true);
 	return new ScanIterator (this);
 } // ScanPlan::init
 
 ScanIterator::ScanIterator (ScanPlan const * const plan) :
-	_plan (plan), _count (plan->_count), Iterator(plan->outTrace)
+	_plan (plan), _count (plan->_count)
 {
-	TRACE (true,outTrace);
+	    TRACE(true);
 
     this->file = "./input/testData.bin";
     cout << "Random data will be written to the file ./data/testData.bin" << "\n";
@@ -38,7 +38,7 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 
 ScanIterator::~ScanIterator ()
 {
-	TRACE (true, outTrace);
+	TRACE (true);
 	traceprintf ("produced %lu of %lu rows\n",
 			(unsigned long) (_count),
 			(unsigned long) (_plan->_count));
@@ -46,7 +46,7 @@ ScanIterator::~ScanIterator ()
 
 bool ScanIterator::next ()
 {
-	TRACE (true,outTrace);
+	    TRACE(true);
 	if (_count >= _plan->_count)
 		return false;
 
@@ -60,7 +60,7 @@ bool ScanIterator::next ()
  * @param size Size of the file to be generated in bytes. Eg: To generate a file of 50KB will be 50*1024 as the size parameter
 */
 std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
-	TRACE (true,outTrace);
+	    TRACE(true);
     std::vector<int> intVector;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -99,7 +99,7 @@ void ScanIterator::saveIntegersToBinaryFile(const std::vector<int>& numbers, con
     outFile.close();
     std::ifstream inFile(filename, std::ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
-	TRACE (true,outTrace);
+	    TRACE(true);
     cout << fileSize << " bytes written to file" << filename << std::endl;
     inFile.close();
     }
@@ -117,7 +117,7 @@ vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename
     vector<int> res;
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
-	TRACE (true,outTrace);
+	    TRACE(true);
     cout << "Size of input file is "<< fileSize << " bytes" << std::endl;
     //seekg used as ate mode moves it to end of file
     inFile.seekg(0, ios::beg);
@@ -134,7 +134,7 @@ vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename
 
 vector<int> ScanIterator::run ()
 {
-	TRACE (true,outTrace);
+	    TRACE(true);
     size_t countOfNumbers = this->_count;
     //generate chunkSize bytes of random data at a time and write it to file
     size_t chunkSize = 50;

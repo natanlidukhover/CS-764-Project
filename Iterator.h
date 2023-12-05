@@ -8,21 +8,19 @@ class Plan
 {
 	friend class Iterator;
 public:
-	Plan (ofstream  &outputStream);
+	Plan ();
 	virtual ~Plan ();
 	virtual class Iterator * init () const = 0;
-	 ofstream  &outTrace;
 private:
 }; // class Plan
 
 class Iterator
 {
 public:
-	Iterator (ofstream  &outputStream);
+	Iterator ();
 	virtual ~Iterator ();
 	void run ();
 	virtual bool next () = 0;
-	 ofstream  &outTrace;
 
 private:
 	RowCount _count;

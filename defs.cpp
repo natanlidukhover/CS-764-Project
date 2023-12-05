@@ -7,9 +7,9 @@
 using namespace std;
 // -----------------------------------------------------------------
 
-Trace::Trace (bool const trace, ofstream  &ofs,char const * const function,
+Trace::Trace (bool const trace, char const * const function,
 		char const * const file, int const line )
-	: _output (trace), _outStream(ofs), _function (function), _file (file), _line (line)
+	: _output (trace), _function (function), _file (file), _line (line)
 {
 	_trace (">>>>>");
 } // Trace::Trace
@@ -24,7 +24,7 @@ void Trace::_trace (char const lead [])
 	if (_output)
 	{
 		//printf ("%s %s (%s:%d)\n", lead, _function, _file, _line);
-		_outStream << lead <<  " " << _function << " " << _file << " " << _line << endl;
+		outTrace << lead <<  " " << _function << " " << _file << " " << _line << endl;
 	}
 		
 } // Trace::_trace

@@ -8,14 +8,13 @@
 using namespace std;
 class Ssd {
 public:
-    Ssd(const char* filename, size_t size, size_t blockSize, ofstream &outputStream);
+    Ssd(const char* filename, size_t size, size_t blockSize);
     ~Ssd();
 
     int writeData(const void* data, size_t seek);
     int readData(void* buffer, size_t offset);
     size_t getReadCount();
     size_t getWriteCount();
-	ofstream  &outTrace;
 private:
     FILE* filePtr;
     size_t _size; //size of the storage source (hdd,ssd,etc)

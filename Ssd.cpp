@@ -8,10 +8,10 @@
 #define cout outTrace
 
 using namespace std;
-Ssd::Ssd(const char* filename, size_t size, size_t blockSize, ofstream  &outputStream) :
+Ssd::Ssd(const char* filename, size_t size, size_t blockSize) :
 	_size(size), _sizeOccupied(0), _readCount(0),
-	_writeCount(0), _blockSize(blockSize), outTrace(outputStream) {
-    TRACE(true, outTrace);
+	_writeCount(0), _blockSize(blockSize) {
+    TRACE(true);
     filePtr = fopen(filename, "a+");
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
@@ -22,13 +22,13 @@ Ssd::~Ssd() {
     fclose(filePtr);
 }
 /**
- * Assume that the data size is always a multiple of _blockSize
+* Assume that the data size is always a multiple of _blockSize
 * @param data: Write _blockSize amount of data present in pointer buffer
 * @param seek: write data from buffer pointer starting at offset seek from ssd
 * @returns The number of bytes written. If we reach end of file, then we return 0
 */
 int Ssd::writeData(const void* data, size_t seek) {
-    TRACE(true, outTrace);
+    TRACE(true);
 
     if (seek + _blockSize > _size) {
         cout << "Found less size to write, hence exiting.Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage" << _size << endl;  

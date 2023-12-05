@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include<fstream>
 #include "Table.h"
+#include<fstream>
 using namespace std;
 typedef uint8_t byte;
 
@@ -43,14 +44,14 @@ void Assert (bool const predicate,
 #define EFULL	(5)
 #define EINF    (6)
 
-
+extern std::ofstream outTrace; 
 // -----------------------------------------------------------------
 
 class Trace
 {
 public :
 
-	Trace (bool const trace, ofstream  &outputStream, char const * const function,
+	Trace (bool const trace, char const * const function,
 			char const * const file, int const line);
 	~Trace ();
 
@@ -59,12 +60,11 @@ private :
 	void _trace (char const lead []);
 
 	bool const _output;
-	ofstream  & _outStream;
 	char const * const _function;
 	char const * const _file;
 	int const _line;
 }; // class Trace
-#define TRACE(trace,outputStream)	Trace __trace (trace,outputStream, __FUNCTION__, __FILE__, __LINE__)
+#define TRACE(trace)	Trace __trace (trace, __FUNCTION__, __FILE__, __LINE__)
 
 // -----------------------------------------------------------------
 

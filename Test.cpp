@@ -32,9 +32,9 @@ int main(int argc, char* argv[]) {
         //     return 1; // Return an error code
         // }
     }
-    std::ofstream  outTrace;
+    //std::ofstream  outTrace;
 	outTrace.open(o_filename,  std::ios_base::out );
-    TRACE(true, outTrace);
+    TRACE(true);
 
  	// Print the values
     cout << "Total number of records " << data_size << std::endl;
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 		cout << "\n";
 	}
 	//for hdd blockSize is given by bandwidth * latency = 100*0.01
-	Ssd * const hdd = new Ssd("./input/testData.bin",(size_t)(data_size*row_size), pow(10,6), outTrace);
+	Ssd * const hdd = new Ssd("./input/testData.bin",(size_t)(data_size*row_size), pow(10,6));
 	size_t offset = data_size + 1;
 	for(size_t i = 0; i < rows; i++)
 	{
