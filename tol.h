@@ -31,19 +31,19 @@ class Run
 {
 	friend class TOL;
 	Storage *source;
-	size_t runSize;
+	size_t runBufferSize;
 	size_t head;
 	size_t tail;
 	size_t rowSize;
 	size_t bufferSize;
 public:
 	Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t t, size_t ms,
-		size_t brs, size_t rowsze, size_t dramTail);
+		size_t rbs, size_t rowsze, size_t dramTail);
 	~Run();
 	int getNext(uint8_t **key);
 	int setNext(uint8_t *key);
 	uint8_t *getBuf();										// Get DRAM buffer
-	size_t getSize();
+	size_t getBufferSize();
 };
 
 #define NT_INODE	(0)

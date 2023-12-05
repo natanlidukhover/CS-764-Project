@@ -39,7 +39,7 @@ Storage::~Storage()
 // ms -> maximum number of bytes which can be fitted in run on SSD/HDD
 // brs -> dram buffer size for this run
 Run::Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t t, size_t ms,
-		size_t brs, size_t rowsze, size_t dramTail): runSize(brs), rowSize(rowsze), tail(dramTail)
+		size_t rbs, size_t rowsze, size_t dramTail): runBufferSize(rbs), rowSize(rowsze), tail(dramTail)
 {
 	head = 0;
 	source = new Storage(_s, _d, bs, ss, t, ms);
@@ -103,7 +103,7 @@ int Run::getNext(uint8_t **key)
 	int ret;
 	if (head >= tail) {
 		size_t dataRead = 0;
-		if ((ret = source->getNext(dataRead, runSize)) == SUCCESS) {
+		if ((ret = source->getNext(dataRead, source->blockSize)) == SUCCESS) {
 			head = 0;
 			tail = dataRead;
 		} else {
@@ -118,8 +118,8 @@ int Run::getNext(uint8_t **key)
 int Run::setNext(uint8_t *key)
 {
 	int ret;
-	if (tail + rowSize > runSize) {
-		if((ret = source->setNext(runSize)) == SUCCESS) {
+	if (tail + rowSize > runBufferSize) {
+		if((ret = source->setNext(runBufferSize)) == SUCCESS) {
 			head = 0;
 			tail = 0;
 		} else {
@@ -136,9 +136,9 @@ uint8_t *Run::getBuf()
 	return source->d;
 }
 
-size_t Run::getSize()
+size_t Run::getBufferSize()
 {
-    return runSize;
+    return runBufferSize;
 }
 
 ETable::ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey
