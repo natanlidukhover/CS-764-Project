@@ -38,7 +38,7 @@ class Run
 	size_t bufferSize;
 public:
 	Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t t, size_t ms,
-		size_t brs, size_t rowsze);
+		size_t brs, size_t rowsze, size_t dramTail);
 	~Run();
 	int getNext(uint8_t **key);
 	int setNext(uint8_t *key);

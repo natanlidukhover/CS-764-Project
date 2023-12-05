@@ -39,10 +39,9 @@ Storage::~Storage()
 // ms -> maximum number of bytes which can be fitted in run on SSD/HDD
 // brs -> dram buffer size for this run
 Run::Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t t, size_t ms,
-		size_t brs, size_t rowsze): runSize(brs), rowSize(rowsze)
+		size_t brs, size_t rowsze, size_t dramTail): runSize(brs), rowSize(rowsze), tail(dramTail)
 {
 	head = 0;
-	tail = 0;
 	source = new Storage(_s, _d, bs, ss, t, ms);
 }
 
