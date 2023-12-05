@@ -13,7 +13,6 @@ public:
 
     // Updated method signatures
     bool writeData(uint8_t data);
-    bool readData(uint8_t* buffer, size_t offset, size_t numPages);
 
     int writeData(const void* data, size_t seek);
     int writeData(Table data, size_t offset);

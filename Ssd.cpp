@@ -43,29 +43,6 @@ bool Ssd::writeData(uint8_t data) {
     return true;
 }
 
-bool Ssd::readData(uint8_t* buffer, size_t offset, size_t numPages) {
-    uint8_t* bufferPtr = reinterpret_cast<uint8_t*>(buffer);
-
-    for (size_t page = 0; page < numPages; ++page) {
-        if (offset + _blockSize > _sizeOccupied) {
-            break;
-        }
-
-        fseek(filePtr, offset, SEEK_SET);
-        size_t read = fread(bufferPtr, 1, _blockSize, filePtr);
-        if (read != _blockSize) {
-            break;
-        }
-
-        _readCount++;
-        offset += _blockSize;
-        bufferPtr += _blockSize;
-    }
-
-    return true;
-}
-
-
 
 int Ssd::writeData(const void* data, size_t seek) {
     TRACE(true, outTrace);
@@ -128,7 +105,7 @@ int Ssd::readData(void* buffer, size_t seek) {
     }
     fseek(filePtr, seek, SEEK_SET);
     size_t read = fread(buffer, 1, _blockSize, filePtr);
-    if (read != _blockSize) {
+    if (read > _blockSize) {
         return FIO;
     }
     _readCount++;
