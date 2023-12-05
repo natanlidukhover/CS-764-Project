@@ -27,12 +27,7 @@ int main(int argc, char* argv[]) {
         } else if (strcmp(argv[i], "-o") == 0) {
             o_filename = argv[i + 1];
         } 
-		// else {
-        //     std::cerr << "Invalid option: " << argv[i] << std::endl;
-        //     return 1; // Return an error code
-        // }
     }
-    //std::ofstream  outTrace;
 	outTrace.open(o_filename,  std::ios_base::out );
     TRACE(true);
 
@@ -40,7 +35,9 @@ int main(int argc, char* argv[]) {
     cout << "Total number of records " << data_size << std::endl;
     cout << "Size of one record" << row_size << std::endl;
     cout << "Output_filename: " << o_filename << std::endl;
-
+	//for hdd blockSize is given by bandwidth * latency = 100*0.01
+	Ssd *  unsorted_hdd = new Ssd("./input/testData.bin",(size_t)data_size*row_size, 3);
+    Ssd *  sorted_hdd = new Ssd("./output/testData.bin",(size_t)data_size*row_size, 3);	
 	size_t rows = (data_size/row_size) + ((data_size % row_size) == 0 ? 0 : 1) ;
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (data_size));
 	vector<int> numbers = sc_it->run();
@@ -68,12 +65,11 @@ int main(int argc, char* argv[]) {
 		}
 		cout << "\n";
 	}
-	//for hdd blockSize is given by bandwidth * latency = 100*0.01
-	Ssd * const hdd = new Ssd("./input/testData.bin",(size_t)(data_size*row_size), pow(10,6));
-	size_t offset = data_size + 1;
+	
+	size_t offset = 0;
 	for(size_t i = 0; i < rows; i++)
 	{
-		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
+		sorted_hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
 	}
     return 0;
 }  // main

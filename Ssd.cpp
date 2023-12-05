@@ -12,7 +12,7 @@ Ssd::Ssd(const char* filename, size_t size, size_t blockSize) :
 	_size(size), _sizeOccupied(0), _readCount(0),
 	_writeCount(0), _blockSize(blockSize) {
     TRACE(true);
-    filePtr = fopen(filename, "a+");
+    filePtr = fopen(filename, "w+");
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
     }
@@ -34,7 +34,7 @@ int Ssd::writeData(const void* data, size_t seek) {
         cout << "Found less size to write, hence exiting.Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage" << _size << endl;  
         return 0;
     }
-    cout << "Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage " << _size << endl;  
+    cout << "Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage " << _size << " Filepointer" << filePtr << endl;  
     fseek(filePtr, seek, SEEK_SET);
     size_t written = fwrite(data, 1, _blockSize, filePtr);
     _writeCount = _writeCount + 1;

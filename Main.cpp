@@ -21,8 +21,8 @@ std::ofstream  outTrace;
 int main_buggy(int argc, char* argv[]) {
 
     // Default values
-   	size_t number_of_records = 5;							// Number of rows
-	size_t row_size = 1; 									// Size of each row in bytes
+   	size_t number_of_records = 12;							// Number of rows
+	size_t row_size = 3; 									// Size of each row in bytes
     size_t totalDataSize = number_of_records * row_size;   	// Total amount of data in bytes
     std::string o_filename="o.txt";							// Output file name
 
@@ -44,8 +44,8 @@ int main_buggy(int argc, char* argv[]) {
     cout << "Total number of records " << number_of_records << std::endl;
     cout << "Size of one record" << row_size << std::endl;
     cout << "Output_filename: " << o_filename << std::endl;
-    Ssd *  unsorted_hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, pow(10,6));
-    Ssd *  sorted_hdd = new Ssd("./output/testData.bin",(size_t)number_of_records*row_size, pow(10,6));
+    Ssd *  unsorted_hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, 3);
+    Ssd *  sorted_hdd = new Ssd("./output/testData.bin",(size_t)number_of_records*row_size, 3);
 
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records));
 	vector<int> numbers = sc_it->run();
@@ -79,7 +79,7 @@ int main_buggy(int argc, char* argv[]) {
 	}
 	//for hdd blockSize is given by bandwidth * latency = 100*0.01
 	
-	size_t offset = (number_of_records*row_size) + 1;
+	size_t offset = 0;
 	for(size_t i = 0; i < number_of_records; i++)
 	{
 		sorted_hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
