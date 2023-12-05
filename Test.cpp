@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     cout << "Output_filename: " << o_filename << std::endl;
 
 	size_t rows = (data_size/row_size) + ((data_size % row_size) == 0 ? 0 : 1) ;
-	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (data_size,outTrace));
+	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (data_size));
 	vector<int> numbers = sc_it->run();
 	
 	Table tmp(rows, 3, row_size/3);

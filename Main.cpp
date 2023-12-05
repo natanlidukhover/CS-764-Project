@@ -44,14 +44,15 @@ int main_buggy(int argc, char* argv[]) {
     cout << "Total number of records " << number_of_records << std::endl;
     cout << "Size of one record" << row_size << std::endl;
     cout << "Output_filename: " << o_filename << std::endl;
-    Ssd *  hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, pow(10,6));
+    Ssd *  unsorted_hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, pow(10,6));
+    Ssd *  sorted_hdd = new Ssd("./output/testData.bin",(size_t)number_of_records*row_size, pow(10,6));
 
-	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records,outTrace));
+	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records));
 	vector<int> numbers = sc_it->run();
 	
 	Table tmp(number_of_records, 3, row_size/3);
 	uint8_t *data = (uint8_t *)dram.getSpace(1 * pow(10, 6));
-    Run initRun(hdd, data, (size_t)(1 * 1e6), (size_t)0, number_of_records * row_size, number_of_records * row_size, (size_t)1e6, row_size, (size_t)0);
+    Run initRun(unsorted_hdd, data, (size_t)(1 * 1e6), (size_t)0, number_of_records * row_size, number_of_records * row_size, (size_t)1e6, row_size, (size_t)0);
     uint8_t *row;
     size_t k = 0;
 	for (size_t i = 0; i < number_of_records; i++) {
@@ -81,7 +82,7 @@ int main_buggy(int argc, char* argv[]) {
 	size_t offset = (number_of_records*row_size) + 1;
 	for(size_t i = 0; i < number_of_records; i++)
 	{
-		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
+		sorted_hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
 	}
 
 /**
