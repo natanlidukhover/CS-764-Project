@@ -85,69 +85,125 @@ int main_buggy(int argc, char* argv[]) {
 		sorted_hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
 	}
 
-/**
-     * Case 1: <= 99 MB
-     * Case 2: <= 9.9 GB
-     * Case 3: <= 990 GB
+    /**
+     * Case 1: < 100 MB
+     * Case 2: < 10 GB
+     * Case 3: >= 10 GB
     */
-    // Constant creation
-    const size_t ssdBlockSize = 10 * KB;
-    const size_t hddBlockSize = 1 * MB;
-    const size_t cacheLimit = 1 * MB;
-    const size_t dramLimit = 100 * MB;
-    const size_t ssdLimit = 10 * GB;
+    // Create constants
+    const size_t ssdBlockSize = 10 * (size_t) KB;
+    const size_t hddBlockSize = 1 * (size_t) MB;
+    const size_t cacheLimit = 1 * (size_t) MB;
+    const size_t dramLimit = 100 * (size_t) MB;
+    const size_t ssdLimit = 10 * (size_t) GB;
     const size_t ssdMaxRunCount = 100;
     const size_t hddMaxRunCount = 97;
-    const size_t cacheRunSize = 990 * KB;
-    size_t dramToSsdRunSize = dramLimit - ssdBlockSize;
+    const size_t ssdMaxInputBufferSize = ssdMaxRunCount * ssdBlockSize;
+    const size_t hddMaxInputBufferSize = hddMaxRunCount * hddBlockSize;
+    const size_t cacheRunSize = 990 * (size_t) KB;
     size_t dramToHddInputBufferSize = dramLimit - hddBlockSize;
-    // Buffer creation
-    uint8_t* dramToHddInputBuffer = (uint8_t*) malloc(dramToHddInputBufferSize);
-    uint8_t* hddOutputBuffer = (uint8_t*) malloc(hddBlockSize);
+    // Create buffers
+    uint8_t* dramToHddInputBuffer;
+    uint8_t* hddOutputBuffer;
 
-    // Case 1 (exclusive with case 2/3)
-    // Read input into DRAM to HDD input buffer
-    
-    // Generate cache-size runs over the input buffer
+    if (totalDataSize < dramLimit) { // Case 1: DRAM->HDD (exclusive with case 2/3)
+        // Create buffers
+        dramToHddInputBuffer = (uint8_t*) dram.getSpace(dramToHddInputBufferSize);
+        hddOutputBuffer = (uint8_t*) dram.getSpace(hddBlockSize);
 
-    // Merge these runs using Tree-of-Losers and output to HDD using hddOutputBuffer
+        // Read input into DRAM to HDD input buffer
+        
+        // Generate cache-size runs over the input buffer
 
-    // Case 2
-    // Constant creation
-    dramToHddInputBufferSize = dramLimit - hddBlockSize - (ssdMaxRunCount * ssdBlockSize);
-    size_t ssdTotalDataSize = totalDataSize - dramToHddInputBufferSize;
-    // Bufer creation
-    dramToHddInputBuffer = (uint8_t*) malloc(dramToHddInputBufferSize);
-    uint8_t* dramToSsdInputBuffer = (uint8_t*) malloc(dramToSsdRunSize);
-    uint8_t* ssdOutputBuffer = (uint8_t*) malloc(ssdBlockSize);
-    uint8_t** ssdInputBuffers = (uint8_t**) malloc(ssdBlockSize * ssdMaxRunCount);
+        // Merge these runs using Tree-of-Losers and output to HDD using hddOutputBuffer
 
-    // Read input into DRAM to SSD input buffer
+        // Free buffers
+        dram.freeSpace(hddOutputBuffer, hddBlockSize);
+        dram.freeSpace(dramToHddInputBuffer, dramToHddInputBufferSize);
+    } else { // Case 2: DRAM->SSD, SSD->HDD
+        // Create constants
+        const size_t ssdRunSize = dramLimit - ssdBlockSize;
+        const size_t dramToSsdInputBufferSize = ssdRunSize;
+        const size_t ssdOutputBufferSize = ssdBlockSize;
+        const size_t hddOutputBufferSize = hddBlockSize;
+        size_t minDramToHddInputBufferSize = dramLimit - ssdOutputBufferSize - ssdMaxInputBufferSize;
+        const size_t ssdMaxDataSize = totalDataSize - minDramToHddInputBufferSize;
+        const size_t numberOfSsdRuns = (ssdMaxDataSize / ssdRunSize) + (ssdMaxDataSize % ssdRunSize != 0); // Round up
+        
+        dramToHddInputBufferSize = dramLimit - hddOutputBufferSize - (numberOfSsdRuns * ssdBlockSize);
 
-    // Generate cache-size runs over the input buffer
+        // Create buffers
+        uint8_t* ssdOutputBuffer = (uint8_t*) dram.getSpace(ssdOutputBufferSize);
+        uint8_t* dramToSsdInputBuffer = (uint8_t*) dram.getSpace(dramToSsdInputBufferSize);
 
-    // Merge these runs using Tree-of-Losers and output to SSD using ssdOutputBuffer
+        // Read input into DRAM to SSD input buffer
 
-    // Read input into DRAM to HDD input buffer
+        // Generate cache-size runs over the input buffer
 
-    // Generate cache-size runs over the input buffer
+        // Merge these runs using Tree-of-Losers and output to SSD using ssdOutputBuffer
 
-    // Merge these runs with the SSD input buffers using Tree-of-Losers and output to HDD using hddOutputBuffer
+        // Free buffers
+        dram.freeSpace(dramToSsdInputBuffer, dramToSsdInputBufferSize);
+        dram.freeSpace(ssdOutputBuffer, ssdOutputBufferSize);
 
+        // Create new buffers
+        dramToHddInputBuffer = (uint8_t*) dram.getSpace(dramToHddInputBufferSize);
+        uint8_t* ssdInputBuffers[numberOfSsdRuns];
+        for (unsigned i = 0; i < numberOfSsdRuns; i++) {
+            ssdInputBuffers[i] = (uint8_t*) dram.getSpace(ssdBlockSize);
+        }
+        hddOutputBuffer = (uint8_t*) dram.getSpace(hddOutputBufferSize);
 
-    // Case 3 (in addition to case 2)
-    // Constant creation
-    dramToHddInputBufferSize = dramLimit - hddBlockSize - (ssdMaxRunCount * ssdBlockSize) - (hddMaxRunCount * hddBlockSize);
-    // Buffer creation
-    dramToHddInputBuffer = (uint8_t*) malloc(dramToHddInputBufferSize);
-    uint8_t** hddInputBuffers = (uint8_t**) malloc(hddBlockSize * hddMaxRunCount);
+        // Read input into DRAM to HDD input buffer
 
-    // Read input into the DRAM to HDD input buffer
+        // Generate cache-size runs over the input buffer
 
-    // Generate cache-size runs over the input buffer
+        // Merge these runs with the SSD input buffers using Tree-of-Losers and output to HDD using hddOutputBuffer
 
-    // Merge these runs with the SSD and HDD input buffers using Tree-of-Losers and output to HDD using hddOutputBuffer
+        // Free buffers
+        dram.freeSpace(hddOutputBuffer, hddOutputBufferSize);
+        for (unsigned i = 0; i < numberOfSsdRuns; i++) {
+            (uint8_t*) dram.freeSpace(ssdInputBuffers[i], ssdBlockSize);
+        }
+        dram.freeSpace(dramToHddInputBuffer, dramToHddInputBufferSize);
 
+        if (totalDataSize >= ssdLimit) { // Case 3: DRAM->SSD, SSD->HDD, HDD->HDD (in addition to case 2)
+            // Create constants
+            size_t hddRunSize = ssdLimit - hddBlockSize;
+            minDramToHddInputBufferSize = dramLimit - ssdOutputBufferSize - ssdMaxInputBufferSize - hddMaxInputBufferSize;
+            const size_t hddMaxDataSize = totalDataSize - hddMaxInputBufferSize - minDramToHddInputBufferSize;
+            const size_t numberOfHddRuns = (hddMaxDataSize / hddRunSize) + (hddMaxDataSize % hddRunSize != 0); // Round up
 
+            dramToHddInputBufferSize = dramLimit - hddOutputBufferSize - (ssdMaxRunCount * ssdBlockSize) - (numberOfHddRuns * hddBlockSize);
+
+            // Create buffers
+            dramToHddInputBuffer = (uint8_t*) dram.getSpace(dramToHddInputBufferSize);
+            uint8_t* ssdInputBuffers[ssdMaxRunCount];
+            for (unsigned i = 0; i < ssdMaxRunCount; i++) {
+                ssdInputBuffers[i] = (uint8_t*) dram.getSpace(ssdBlockSize);
+            }
+            uint8_t* hddInputBuffers[numberOfHddRuns];
+            for (unsigned i = 0; i < numberOfHddRuns; i++) {
+                hddInputBuffers[i] = (uint8_t*) dram.getSpace(hddBlockSize);
+            }
+            uint8_t* hddOutputBuffer = (uint8_t*) dram.getSpace(hddOutputBufferSize);
+
+            // Read input into the DRAM to HDD input buffer
+
+            // Generate cache-size runs over the input buffer
+
+            // Merge these runs with the SSD and HDD input buffers using Tree-of-Losers and output to HDD using hddOutputBuffer
+
+            // Free buffers
+            dram.freeSpace(hddOutputBuffer, hddOutputBufferSize);
+            for (unsigned i = 0; i < numberOfHddRuns; i++) {
+                (uint8_t*) dram.freeSpace(hddInputBuffers[i], hddBlockSize);
+            }
+            for (unsigned i = 0; i < ssdMaxRunCount; i++) {
+                (uint8_t*) dram.freeSpace(ssdInputBuffers[i], ssdBlockSize);
+            }
+            dram.freeSpace(dramToHddInputBuffer, dramToHddInputBufferSize);
+        }
+    }
     return 0;
 }  // main
