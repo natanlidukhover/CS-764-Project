@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 		}
 		cout << "\n";
 	}
-	//for hdd pagesize is given by bandwidth * latency = 100*0.01
+	//for hdd blockSize is given by bandwidth * latency = 100*0.01
 	Ssd * const hdd = new Ssd("./input/testData.bin",(size_t)(data_size*row_size), pow(10,6), outTrace);
 	size_t offset = data_size + 1;
 	for(size_t i = 0; i < rows; i++)

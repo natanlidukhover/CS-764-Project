@@ -8,7 +8,7 @@
 using namespace std;
 class Ssd {
 public:
-    Ssd(const char* filename, size_t size, size_t pageSize, ofstream &outputStream);
+    Ssd(const char* filename, size_t size, size_t blockSize, ofstream &outputStream);
     ~Ssd();
 
     // Updated method signatures
@@ -24,7 +24,6 @@ public:
 private:
     FILE* filePtr;
     size_t _size; //size of the storage source (hdd,ssd,etc)
-    size_t _pageSize;
     size_t _sizeOccupied;
 
     size_t _readCount;  // read call counter

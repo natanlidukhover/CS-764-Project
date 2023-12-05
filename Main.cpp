@@ -75,7 +75,7 @@ int main_buggy(int argc, char* argv[]) {
 		}
 		cout << "\n";
 	}
-	//for hdd pagesize is given by bandwidth * latency = 100*0.01
+	//for hdd blockSize is given by bandwidth * latency = 100*0.01
 	
 	size_t offset = (number_of_records*row_size) + 1;
 	for(size_t i = 0; i < number_of_records; i++)
