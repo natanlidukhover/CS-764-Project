@@ -1,28 +1,28 @@
 #include "Iterator.h"
 
-Plan::Plan ()
+Plan::Plan (ofstream &outputStream) : outTrace(outputStream)
 {
-	TRACE (true);
+	TRACE (true, outTrace);
 } // Plan::Plan
 
 Plan::~Plan ()
 {
-	TRACE (true);
+	//TRACE (true);
 } // Plan::~Plan
 
-Iterator::Iterator () : _count (0)
+Iterator::Iterator (ofstream  &outputStream) : _count (0),outTrace(outputStream)
 {
-	TRACE (true);
+	TRACE (true,outTrace);
 } // Iterator::Iterator
 
 Iterator::~Iterator ()
 {
-	TRACE (true);
+	TRACE (true,outTrace);
 } // Iterator::~Iterator
 
 void Iterator::run ()
 {
-	TRACE (true);
+	TRACE (true, outTrace);
 
 	while (next ())  ++ _count;
 
