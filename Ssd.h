@@ -15,7 +15,6 @@ public:
     bool writeData(uint8_t data);
 
     int writeData(const void* data, size_t seek);
-    int writeData(Table data, size_t offset);
     int readData(void* buffer, size_t offset);
     size_t getReadCount();
     size_t getWriteCount();

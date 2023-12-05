@@ -63,41 +63,6 @@ int Ssd::writeData(const void* data, size_t seek) {
     return SUCCESS;
 }
 
-int Ssd::writeData(Table data, size_t offset)
-{
-    TRACE(true, outTrace);
-    if (offset + _blockSize > _size) {
-        cout << "Found less size to write, hence exiting.Offset:" << offset << " blockSize:" << _blockSize << " Size of storage" << _size <<  endl;  
-        return FEOF;
-    }
-    cout << "Offset :" << offset << " blockSize:" << _blockSize << " Size of storage " << _size << endl;  
-    fseek(filePtr, offset, SEEK_SET);
-	// size_t numBlockToWrite = (data_size/_blockSize) + ((data_size%_blockSize==1));
-    // size_t written = 0;
-    // cout << "Blocks to write " << numBlockToWrite << " Seek pointer" << seek << endl;
-    // for (size_t i = 0; i < numBlockToWrite; i++) {
-	// 	written += fwrite(data, 1, data_size, filePtr);
-	// }
-    // if (written != data_size) {
-    //     return FIO;
-    // }
-    // _writeCount = _writeCount + (data_size/_blockSize) + ((data_size%_blockSize==1));
-    // return SUCCESS;
-    size_t written = 0;
-    cout << data._NumRows << " " << data._rowSize << endl;
-    for(size_t i = 0; i < data._NumRows; i++)
-	{
-		//cout << "Row number " << i  << " " << offset + i*(row_size) << " " << row_size << endl;
-		// hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size),row_size);
-        written += fwrite(data[i], 1, data._rowSize, filePtr);
-	}
-    if (written != data._rowSize) {
-        cout << "Written data not equal to rowSize";
-        //return FIO;
-    }
-    //_writeCount = _writeCount + (data_size/_blockSize) + ((data_size%_blockSize==1));
-    return SUCCESS;
-}
 
 /**
 * @param buffer: Read _blockSize amount of data in pointer buffer

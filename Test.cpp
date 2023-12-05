@@ -75,6 +75,5 @@ int main(int argc, char* argv[]) {
 	{
 		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
 	}
-	//hdd->writeData(tmp, offset);
     return 0;
 }  // main
