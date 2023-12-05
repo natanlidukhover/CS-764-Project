@@ -82,8 +82,6 @@ int main_buggy(int argc, char* argv[]) {
 	{
 		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
 	}
-	//hdd->writeData(tmp, offset);
-
 
 /**
      * Case 1: <= 99 MB

@@ -22,28 +22,6 @@ Ssd::~Ssd() {
     fclose(filePtr);
 }
 
-bool Ssd::writeData(uint8_t data) {
-
-    if (_sizeOccupied + 1 > _size) {
-        return false;
-    }
-
-    fseek(filePtr, _sizeOccupied, SEEK_SET);
-    size_t written = fwrite(&data, 1, 1, filePtr);
-    if (written != 1) {
-        return false;
-    }
-
-    _sizeOccupied += 1;
-
-    if (_sizeOccupied % _blockSize == 0) {
-        _writeCount++;
-    }
-
-    return true;
-}
-
-
 int Ssd::writeData(const void* data, size_t seek) {
     TRACE(true, outTrace);
 

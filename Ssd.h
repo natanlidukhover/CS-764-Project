@@ -11,9 +11,6 @@ public:
     Ssd(const char* filename, size_t size, size_t blockSize, ofstream &outputStream);
     ~Ssd();
 
-    // Updated method signatures
-    bool writeData(uint8_t data);
-
     int writeData(const void* data, size_t seek);
     int readData(void* buffer, size_t offset);
     size_t getReadCount();
