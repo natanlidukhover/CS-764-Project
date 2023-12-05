@@ -68,13 +68,12 @@ int main(int argc, char* argv[]) {
 		}
 		cout << "\n";
 	}
-	//for hdd pagesize is given by bandwidth * latency = 100*0.01
-	Ssd * const hdd = new Ssd("./input/testData.bin",(size_t)1024, row_size, data_size, outTrace);
+	//for hdd blockSize is given by bandwidth * latency = 100*0.01
+	Ssd * const hdd = new Ssd("./input/testData.bin",(size_t)(data_size*row_size), pow(10,6), outTrace);
 	size_t offset = data_size + 1;
 	for(size_t i = 0; i < rows; i++)
 	{
 		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
 	}
-	//hdd->writeData(tmp, offset);
     return 0;
 }  // main

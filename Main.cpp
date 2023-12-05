@@ -43,7 +43,7 @@ int main_buggy(int argc, char* argv[]) {
     cout << "Total number of records " << number_of_records << std::endl;
     cout << "Size of one record" << row_size << std::endl;
     cout << "Output_filename: " << o_filename << std::endl;
-    Ssd *  hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, pow(10,6), number_of_records*row_size, outTrace);
+    Ssd *  hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, pow(10,6), outTrace);
 
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records,outTrace));
 	vector<int> numbers = sc_it->run();
@@ -75,15 +75,13 @@ int main_buggy(int argc, char* argv[]) {
 		}
 		cout << "\n";
 	}
-	//for hdd pagesize is given by bandwidth * latency = 100*0.01
+	//for hdd blockSize is given by bandwidth * latency = 100*0.01
 	
 	size_t offset = (number_of_records*row_size) + 1;
 	for(size_t i = 0; i < number_of_records; i++)
 	{
 		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
 	}
-	//hdd->writeData(tmp, offset);
-
 
 /**
      * Case 1: <= 99 MB
