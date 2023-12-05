@@ -99,17 +99,19 @@ int Ssd::writeData(Table data, size_t offset)
     return SUCCESS;
 }
 
+/**
+* @param buffer: Read _blockSize amount of data in pointer buffer
+* @param seek: Read data into buffer pointer starting at offset seek from hdd
+* @returns The number of bytes read. If we reach end of file, then we return 0
+*/
 int Ssd::readData(void* buffer, size_t seek) {
     if (seek + _blockSize > _size) {
-        return FEOF;
+        return 0;
     }
     fseek(filePtr, seek, SEEK_SET);
-    size_t read = fread(buffer, 1, _blockSize, filePtr);
-    if (read > _blockSize) {
-        return FIO;
-    }
+    size_t read_bytes = fread(buffer, 1, _blockSize, filePtr);
     _readCount++;
-    return SUCCESS;
+    return read_bytes;
 }
 
 size_t Ssd::getReadCount() {
