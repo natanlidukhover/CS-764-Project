@@ -24,5 +24,5 @@ private:
 	RowCount _consumed, _produced;
 }; // class SortIterator
 
-void generateRuns(Table& t, int startRow, int endRow, int col);
-void verifySortedRuns(Table &t, int startRow, int endRow, int col);
+void quickSort(uint8_t *data, size_t numRows, size_t rowSize);
+void verifySortedRuns(uint8_t *data, int numRows, size_t rowSize);

@@ -50,52 +50,63 @@
 // 	return true;
 // } // SortIterator::next
 
-int partition(Table& t, int startRow, int endRow, int col) {
+int partition(uint8_t *data, int startRow, int endRow, int rowSize) {
 	int pivot = endRow;
 	int i = startRow - 1;
-	uint8_t *tmp;
+	uint8_t tmp;
 	int cmp_col;
+	int col = 0;
 
 	for (int j = startRow; j <= endRow - 1; j++) {
 		cmp_col = col;
-		while (t(j, cmp_col) == t(pivot, cmp_col)) {
-			cmp_col = (cmp_col + 1) % t._rowSize;
+		while (data[j * rowSize + cmp_col] == data[pivot * rowSize + cmp_col]) {
+			cmp_col = (cmp_col + 1) % rowSize;
 			if (cmp_col == col)
 				break;
 		}
-		if (t(j, cmp_col) < t(pivot, cmp_col)) {
+		if (data[j * rowSize + cmp_col] < data[pivot * rowSize + cmp_col]) {
 			i++;
-			tmp = *t(i);
-			*t(i) = *t(j);
-			*t(j) = tmp;
+			for (int k = 0; k < rowSize; k++) {
+				tmp = data[i * rowSize + k];
+				data[i * rowSize + k] = data[j * rowSize + k];
+				data[j * rowSize + k] = tmp;
+			}
 		}
 	}
 	i++;
-	tmp = *t(i);
-	*t(i) = *t(endRow);
-	*t(endRow) = tmp;
+	for (int k = 0; k < rowSize; k++) {
+		tmp = data[i * rowSize + k];
+		data[i * rowSize + k] = data[endRow * rowSize + k];
+		data[endRow * rowSize + k] = tmp;
+	}
 	return i;
 }
 
-void generateRuns(Table& t, int startRow, int endRow, int col) {
+void qs(uint8_t *data, size_t startRow, size_t endRow, size_t rowSize) {
 	int pivot;
 	if (startRow >= endRow || startRow < 0)
 		return;
-	pivot = partition(t, startRow, endRow, col);
-	generateRuns(t, startRow, pivot - 1, col);
-	generateRuns(t, pivot + 1, endRow, col);
+	pivot = partition(data, startRow, endRow, rowSize);
+	qs(dataRow, startRow, pivot - 1, rowSize);
+	qs(dataRow, pivot + 1, endRow, rowSize);
 }
 
-void verifySortedRuns(Table &t, int startRow, int endRow, int col) {
+void quickSort(uint8_t *data, size_t numRows, size_t rowSize) {
+	qs(data, 0, numRows - 1, rowSize);
+}
+
+void verifySortedRuns(uint8_t *data, int numRows, size_t rowSize) {
+	int col = 0;
 	int cmp_col;
+	int startRow = 0;
 	for (int i = startRow + 1; i <= endRow; i++) {
 		cmp_col = col;
-		while (t(i, cmp_col) == t(i - 1, cmp_col)) {
-			cmp_col = (cmp_col + 1) % t._rowSize;
+		while (data[i * rowSize + cmp_col] == data[(i - 1) * rowSize + cmp_col]) {
+			cmp_col = (cmp_col + 1) % rowSize;
 			if (cmp_col == col)
 				break;
 		}
-		if (t(i, cmp_col) < t(i - 1, cmp_col)) {
+		if (data[i * rowSize + cmp_col] < data[(i - 1) * rowSize + cmp_col]) {
 			std::cout << "unsorted at row:" << i << std::endl;
 			return;
 		}

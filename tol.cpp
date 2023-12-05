@@ -63,13 +63,9 @@ int Storage::getNext(size_t &actSze, size_t sze = 0)
 	if (head >= tail)
 		return EEMPTY;
 	size_t i;
-	int data_read = 0, ret = SUCCESS;
+	int data_read = 0;
 	for (i = head; i < tail && i < (head + sze); i += blockSize) {
-		if ((ret = s->readData(d + data_read,
-				srcSeek + i))) {
-			return ret;
-		}
-		data_read += blockSize;
+		data_read += s->readData(d + data_read, srcSeek + i);
 	}
 	head += data_read;
 	actSze = data_read;
@@ -86,12 +82,8 @@ int Storage::setNext(size_t sze = 0)
 		return EFULL;
 
     size_t data_written = 0;
-	int ret = SUCCESS;
     for (size_t i = tail; i < (tail + sze); i += blockSize) {
-        if (ret == s->writeData(d + data_written, srcSeek + i)) {
-            return ret;
-        }
-        data_written += blockSize;
+        data_written += s->writeData(d + data_written, srcSeek + i);
     }
 
     tail += data_written;

@@ -50,30 +50,31 @@ int main_buggy(int argc, char* argv[]) {
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records));
 	vector<int> numbers = sc_it->run();
 	
-	Table tmp(number_of_records, 3, row_size/3);
+	//Table tmp(number_of_records, 3, row_size/3);
 	uint8_t *data = (uint8_t *)dram.getSpace(1 * pow(10, 6));
-    Run initRun(unsorted_hdd, data, (size_t)(1 * 1e6), (size_t)0, number_of_records * row_size, number_of_records * row_size, (size_t)1e6, row_size, (size_t)0);
-    uint8_t *row;
-    size_t k = 0;
+    //Run initRun(unsorted_hdd, data, (size_t)(1 * 1e6), (size_t)0, number_of_records * row_size, number_of_records * row_size, (size_t)1e6, row_size, (size_t)0);
+    //uint8_t *row;
+	for (size_t i = 0; i < number_of_records * row_size; i += pow(10, 6)) {
+		unsorted_hdd->readData(data + i, i);
+	}
 	for (size_t i = 0; i < number_of_records; i++) {
-        initRun.getNext(&row);
+        //initRun.getNext(&row);
 		for (size_t j = 0; j < row_size; j++) {
-            tmp[i][j] = row[j];
-			cout << tmp[i][j];
+            //tmp[i][j] = row[j];
+			cout << data[i * row_size + j];
 			cout << " ";
 		}
 		cout << "\n";
 	}
 	cout << "\n";
 
-	int sort_col = 0;
-	generateRuns(tmp, 0, number_of_records - 1, sort_col);
-	verifySortedRuns(tmp, 0, number_of_records - 1, sort_col);
+	quickSort(data, number_of_records, row_size);
+	verifySortedRuns(data, number_of_records, row_size);
 
 	cout << "Sorted table" << "\n";
 	for (size_t i = 0; i < number_of_records; i++) {
 		for (size_t j = 0; j < row_size; j++) {
-			cout << (int)tmp[i][j] << " ";
+			cout << (int)data[i * row_size + j] << " ";
 		}
 		cout << "\n";
 	}
@@ -82,7 +83,7 @@ int main_buggy(int argc, char* argv[]) {
 	size_t offset = 0;
 	for(size_t i = 0; i < number_of_records; i++)
 	{
-		sorted_hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
+		sorted_hdd->writeData(static_cast<const void*>(data[i * row_size]),offset + i*(row_size));
 	}
 
     /**
