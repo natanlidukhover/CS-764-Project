@@ -11,7 +11,7 @@ using namespace std;
 #define cout outTrace
 
 
-ScanPlan::ScanPlan (RowCount const count, ofstream &outputStream) : _count (count)
+ScanPlan::ScanPlan (RowCount const count) : _count (count)
 {
 	TRACE (true);
 } // ScanPlan::ScanPlan

@@ -19,7 +19,7 @@ private:
 class ScanIterator : public Iterator
 {
 public:
-	ScanIterator (ScanPlan const * const plan, ofstream  &outputStream);
+	ScanIterator (ScanPlan const * const plan);
 	ScanIterator (ScanPlan const * const plan);
 	~ScanIterator ();
 	string file;
