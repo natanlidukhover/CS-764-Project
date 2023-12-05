@@ -21,24 +21,24 @@ Ssd::Ssd(const char* filename, size_t size, size_t blockSize, ofstream  &outputS
 Ssd::~Ssd() {
     fclose(filePtr);
 }
-
+/**
+ * Assume that the data size is always a multiple of _blockSize
+* @param data: Write _blockSize amount of data present in pointer buffer
+* @param seek: write data from buffer pointer starting at offset seek from ssd
+* @returns The number of bytes written. If we reach end of file, then we return 0
+*/
 int Ssd::writeData(const void* data, size_t seek) {
     TRACE(true, outTrace);
 
     if (seek + _blockSize > _size) {
-        cout << "Found less size to write, hence exiting.Offset seek:" << seek << " blockSize:" << _blockSize << " Size of storage" << _size << endl;  
-        return FEOF;
+        cout << "Found less size to write, hence exiting.Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage" << _size << endl;  
+        return 0;
     }
     cout << "Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage " << _size << endl;  
     fseek(filePtr, seek, SEEK_SET);
-    size_t written = 0;
-	written += fwrite(data, 1, _blockSize, filePtr);
-	
-    if (written != _blockSize) {
-        return FIO;
-    }
+    size_t written = fwrite(data, 1, _blockSize, filePtr);
     _writeCount = _writeCount + 1;
-    return SUCCESS;
+    return written;
 }
 
 
