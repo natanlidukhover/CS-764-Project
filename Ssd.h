@@ -8,7 +8,7 @@
 using namespace std;
 class Ssd {
 public:
-    Ssd(const char* filename, size_t size, size_t pageSize, size_t data_size, ofstream &outputStream);
+    Ssd(const char* filename, size_t size, size_t pageSize, ofstream &outputStream);
     ~Ssd();
 
     // Updated method signatures
@@ -30,7 +30,6 @@ private:
     size_t _readCount;  // read call counter
     size_t _writeCount; // write call counter
     size_t _blockSize;   // most efficient IO unit
-    size_t _dataSize; // size of data in bytes
 };
 
 #endif // SSD_H

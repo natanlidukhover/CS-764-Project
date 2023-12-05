@@ -43,7 +43,7 @@ int main_buggy(int argc, char* argv[]) {
     cout << "Total number of records " << number_of_records << std::endl;
     cout << "Size of one record" << row_size << std::endl;
     cout << "Output_filename: " << o_filename << std::endl;
-    Ssd *  hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, pow(10,6), number_of_records*row_size, outTrace);
+    Ssd *  hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, pow(10,6), outTrace);
 
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records,outTrace));
 	vector<int> numbers = sc_it->run();

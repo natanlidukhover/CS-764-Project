@@ -8,9 +8,9 @@
 #define cout outTrace
 
 using namespace std;
-Ssd::Ssd(const char* filename, size_t size, size_t pageSize, size_t data_size, ofstream  &outputStream) :
+Ssd::Ssd(const char* filename, size_t size, size_t pageSize, ofstream  &outputStream) :
 	_size(size), _pageSize(pageSize), _sizeOccupied(0), _readCount(0),
-	_writeCount(0), _blockSize(pageSize), _dataSize(data_size), outTrace(outputStream) {
+	_writeCount(0), _blockSize(pageSize), outTrace(outputStream) {
     TRACE(true, outTrace);
     filePtr = fopen(filename, "a+");
     if (filePtr == nullptr) {
