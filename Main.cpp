@@ -11,14 +11,18 @@
 #include <fstream>
 #include <math.h>
 #define cout outTrace
+#define KB 1024
+#define MB 1024 * KB
+#define GB 1024 * MB
 
 using namespace std;
 int main_buggy(int argc, char* argv[]) {
 
     // Default values
-   	size_t number_of_records = 5 ; //in bytes
-	size_t row_size = 1; // size of 1 row: 50bytes
-    std::string o_filename="o.txt";
+   	size_t number_of_records = 5;							// Number of rows
+	size_t row_size = 1; 									// Size of each row in bytes
+    size_t totalDataSize = number_of_records * row_size;   	// Total amount of data in bytes
+    std::string o_filename="o.txt";							// Output file name
 
     // Parse command-line arguments
     for (int i = 1; i < argc; i += 2) {
@@ -79,5 +83,71 @@ int main_buggy(int argc, char* argv[]) {
 		hdd->writeData(static_cast<const void*>(tmp[i]),offset + i*(row_size));
 	}
 	//hdd->writeData(tmp, offset);
+
+
+/**
+     * Case 1: <= 99 MB
+     * Case 2: <= 9.9 GB
+     * Case 3: <= 990 GB
+    */
+    // Constant creation
+    const size_t ssdBlockSize = 10 * KB;
+    const size_t hddBlockSize = 1 * MB;
+    const size_t cacheLimit = 1 * MB;
+    const size_t dramLimit = 100 * MB;
+    const size_t ssdLimit = 10 * GB;
+    const size_t ssdMaxRunCount = 100;
+    const size_t hddMaxRunCount = 97;
+    const size_t cacheRunSize = 990 * KB;
+    size_t dramToSsdRunSize = dramLimit - ssdBlockSize;
+    size_t dramToHddInputBufferSize = dramLimit - hddBlockSize;
+    // Buffer creation
+    uint8_t* dramToHddInputBuffer = (uint8_t*) malloc(dramToHddInputBufferSize);
+    uint8_t* hddOutputBuffer = (uint8_t*) malloc(hddBlockSize);
+
+    // Case 1 (exclusive with case 2/3)
+    // Read input into DRAM to HDD input buffer
+    
+    // Generate cache-size runs over the input buffer
+
+    // Merge these runs using Tree-of-Losers and output to HDD using hddOutputBuffer
+
+    // Case 2
+    // Constant creation
+    dramToHddInputBufferSize = dramLimit - hddBlockSize - (ssdMaxRunCount * ssdBlockSize);
+    size_t ssdTotalDataSize = totalDataSize - dramToHddInputBufferSize;
+    // Bufer creation
+    dramToHddInputBuffer = (uint8_t*) malloc(dramToHddInputBufferSize);
+    uint8_t* dramToSsdInputBuffer = (uint8_t*) malloc(dramToSsdRunSize);
+    uint8_t* ssdOutputBuffer = (uint8_t*) malloc(ssdBlockSize);
+    uint8_t** ssdInputBuffers = (uint8_t**) malloc(ssdBlockSize * ssdMaxRunCount);
+
+    // Read input into DRAM to SSD input buffer
+
+    // Generate cache-size runs over the input buffer
+
+    // Merge these runs using Tree-of-Losers and output to SSD using ssdOutputBuffer
+
+    // Read input into DRAM to HDD input buffer
+
+    // Generate cache-size runs over the input buffer
+
+    // Merge these runs with the SSD input buffers using Tree-of-Losers and output to HDD using hddOutputBuffer
+
+
+    // Case 3 (in addition to case 2)
+    // Constant creation
+    dramToHddInputBufferSize = dramLimit - hddBlockSize - (ssdMaxRunCount * ssdBlockSize) - (hddMaxRunCount * hddBlockSize);
+    // Buffer creation
+    dramToHddInputBuffer = (uint8_t*) malloc(dramToHddInputBufferSize);
+    uint8_t** hddInputBuffers = (uint8_t**) malloc(hddBlockSize * hddMaxRunCount);
+
+    // Read input into the DRAM to HDD input buffer
+
+    // Generate cache-size runs over the input buffer
+
+    // Merge these runs with the SSD and HDD input buffers using Tree-of-Losers and output to HDD using hddOutputBuffer
+
+
     return 0;
 }  // main
