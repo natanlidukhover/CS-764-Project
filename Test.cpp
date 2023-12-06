@@ -8,15 +8,17 @@
 #include <iostream>
 #include "Ssd.h"
 #include <fstream>
+#include <chrono> 
 #define cout outTrace
 
 using namespace std;
+using namespace std::chrono;
 int main(int argc, char* argv[]) {
-
+	auto start_main = high_resolution_clock::now();
     // Default values
-   	size_t number_of_records = 24;//50MB=50 * 1024 * 1024; //in bytes
-	size_t row_size = 6;
-	size_t blockSize = 3;
+   	size_t number_of_records = 1e4;
+	size_t row_size = 50;
+	size_t blockSize = 25;
     std::string o_filename="o.txt";
 
     // Parse command-line arguments
@@ -39,7 +41,7 @@ int main(int argc, char* argv[]) {
 	//for hdd blockSize is given by bandwidth * latency = 100*0.01
 	Ssd *  unsorted_hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, blockSize);
     Ssd *  sorted_hdd = new Ssd("./output/testData.bin",(size_t)number_of_records*row_size, blockSize);	
-	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records*row_size));
+	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records*row_size, blockSize));
 	vector<int> numbers = sc_it->run();
 	
 	uint8_t *data = (uint8_t *)dram.getSpace(1 * pow(10, 6));
@@ -47,27 +49,27 @@ int main(int argc, char* argv[]) {
 	for (size_t i = 0; i < number_of_records * row_size; i += blockSize) {
 		int bytesread = unsorted_hdd->readData(data + i, i);
 	}
-	for (size_t i = 0; i < number_of_records; i++) {
-        //initRun.getNext(&row);
-		for (size_t j = 0; j < row_size; j++) {
-            //tmp[i][j] = row[j];
-			cout << (int)data[i * row_size + j];
-			cout << " ";
-		}
-		cout << "\n";
-	}
-	cout << "\n";
+	// for (size_t i = 0; i < number_of_records; i++) {
+    //     //initRun.getNext(&row);
+	// 	for (size_t j = 0; j < row_size; j++) {
+    //         //tmp[i][j] = row[j];
+	// 		cout << (int)data[i * row_size + j];
+	// 		cout << " ";
+	// 	}
+	// 	cout << "\n";
+	// }
+	// cout << "\n";
 
 	quickSort(data, number_of_records, row_size);
 	verifySortedRuns(data, number_of_records, row_size);
 
-	cout << "Sorted table" << "\n";
-	for (size_t i = 0; i < number_of_records; i++) {
-		for (size_t j = 0; j < row_size; j++) {
-			cout << (int)data[i * row_size + j] << " ";
-		}
-		cout << "\n";
-	}
+	// cout << "Sorted table" << "\n";
+	// for (size_t i = 0; i < number_of_records; i++) {
+	// 	for (size_t j = 0; j < row_size; j++) {
+	// 		cout << (int)data[i * row_size + j] << " ";
+	// 	}
+	// 	cout << "\n";
+	// }
 
 	//for hdd blockSize is given by bandwidth * latency = 100*0.01
 	
@@ -76,5 +78,10 @@ int main(int argc, char* argv[]) {
 	{
 		sorted_hdd->writeData(static_cast<const void*>(data + (i * blockSize)),offset + i* blockSize);
 	}
+	auto stop_main = high_resolution_clock::now();
+	auto duration_main = duration_cast<seconds>(stop_main - start_main);
+ 
+    cout << "Time taken by main for " << (number_of_records*row_size)/1000 << "kilo bytes data "
+         << duration_main.count() << " seconds" << endl;
     return 0;
 }  // main

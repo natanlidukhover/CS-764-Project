@@ -16,6 +16,11 @@ ScanPlan::ScanPlan (RowCount const count) : _count (count)
 	TRACE (true);
 } // ScanPlan::ScanPlan
 
+ScanPlan::ScanPlan (RowCount const count, size_t blockSize) : _count (count), blockSize(blockSize)
+{
+	TRACE (true);
+} // ScanPlan::ScanPlan
+
 ScanPlan::~ScanPlan ()
 {
 	    TRACE(true);
@@ -28,7 +33,7 @@ Iterator * ScanPlan::init () const
 } // ScanPlan::init
 
 ScanIterator::ScanIterator (ScanPlan const * const plan) :
-	_plan (plan), _count (plan->_count)
+	_plan (plan), _count (plan->_count), blockSize(plan->blockSize)
 {
 	    TRACE(true);
 
@@ -60,7 +65,7 @@ bool ScanIterator::next ()
  * @param size Size of the file to be generated in bytes. Eg: To generate a file of 50KB will be 50*1024 as the size parameter
 */
 std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
-	    TRACE(true);
+	    //TRACE(true);
     std::vector<int> intVector;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -99,7 +104,7 @@ void ScanIterator::saveIntegersToBinaryFile(const std::vector<int>& numbers, con
     outFile.close();
     std::ifstream inFile(filename, std::ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
-	    TRACE(true);
+	    //TRACE(true);
     //cout << fileSize << " bytes written to file" << filename << std::endl;
     inFile.close();
     }
@@ -134,29 +139,29 @@ vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename
 
 vector<int> ScanIterator::run ()
 {
-	    TRACE(true);
-    size_t countOfNumbers = this->_count;
+	TRACE(true);
+    size_t countOfBytes = this->_count;
     //generate chunkSize bytes of random data at a time and write it to file
-    size_t chunkSize = 50;
-    size_t chunks = countOfNumbers/chunkSize;
-    cout << "Number of chunks to write: " << chunks << "each having size" << chunkSize << "\n";
-    for(size_t i = 0; i < chunks; i++)
+    size_t blockSize = this->blockSize;
+    size_t blocks = countOfBytes/blockSize;
+    cout << "Number of chunks to write: " << blocks << "each having size" << blockSize << "\n";
+    for(size_t i = 0; i < blocks; i++)
     {
-        std::vector<int> currChunk = this->getParameters(chunkSize);
+        std::vector<int> currChunk = this->getParameters(blockSize);
         // open the file in truncate mode for the first chunk and then open it in append mode
         // Hence we pass a flag isAppendOnly whose vaue is i which will be false when it is the first run(i=0)
         this->saveIntegersToBinaryFile(currChunk, this->file, i);
-        if(i % 10 == 0){
-            cout << "Written" << i * chunkSize <<"bytes to the file " << this->file << "\n";
+        if(i % (blocks/100) == 0 && i!=0){
+            cout << "Written" << i * blockSize <<"bytes to the file " << this->file << "\n";
         }    
     }
-    size_t remaining = countOfNumbers % chunkSize;
+    size_t remaining = countOfBytes % blockSize;
     if(remaining != 0)
     {
         std::vector<int> remainingChunk = this->getParameters(remaining);
-        this->saveIntegersToBinaryFile(remainingChunk, this->file, chunks > 0);
+        this->saveIntegersToBinaryFile(remainingChunk, this->file, blocks > 0);
     }
 	
-    vector<int> numbers = readIntegersFromBinaryFile(this->file, 1, countOfNumbers);
+    vector<int> numbers = readIntegersFromBinaryFile(this->file, 1, countOfBytes);
     return numbers;
 } // ScanIterator::next

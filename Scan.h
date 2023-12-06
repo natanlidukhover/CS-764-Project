@@ -8,12 +8,14 @@ class ScanPlan : public Plan
 	friend class ScanIterator;
 public:
 	ScanPlan (RowCount const count);
+	ScanPlan (RowCount const count, size_t blockSize);
 	~ScanPlan ();
 	Iterator * init () const;
 	//cannot add below line due to cyclic dependency
 	//ScanIterator * init () const;
 private:
 	RowCount const _count;
+	size_t blockSize;
 }; // class ScanPlan
 
 class ScanIterator : public Iterator
@@ -30,4 +32,6 @@ public:
 private:
 	ScanPlan const * const _plan;
 	RowCount _count;
+	size_t blockSize;
+
 }; // class ScanIterator
