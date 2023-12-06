@@ -24,6 +24,7 @@ int main_buggy(int argc, char* argv[]) {
    	size_t number_of_records = 12;							// Number of rows
 	size_t row_size = 3; 									// Size of each row in bytes
     size_t totalDataSize = number_of_records * row_size;   	// Total amount of data in bytes
+    size_t blockSize = 3;
     std::string o_filename="o.txt";							// Output file name
 
     // Parse command-line arguments
@@ -68,8 +69,8 @@ int main_buggy(int argc, char* argv[]) {
 	}
 	cout << "\n";
 
-	quickSort(data, number_of_records, row_size);
-	verifySortedRuns(data, number_of_records, row_size);
+	quickSort(data, (int) number_of_records, (int)row_size);
+	verifySortedRuns(data, (int)number_of_records,(int) row_size);
 
 	cout << "Sorted table" << "\n";
 	for (size_t i = 0; i < number_of_records; i++) {
@@ -81,9 +82,9 @@ int main_buggy(int argc, char* argv[]) {
 	//for hdd blockSize is given by bandwidth * latency = 100*0.01
 	
 	size_t offset = 0;
-	for(size_t i = 0; i < number_of_records; i++)
+	for(size_t i = 0; i < (number_of_records * row_size)/blockSize; i++)
 	{
-		sorted_hdd->writeData(static_cast<const void*>(data[i * row_size]),offset + i*(row_size));
+		sorted_hdd->writeData(static_cast<const void*>(data + i * blockSize),offset + i*(blockSize));
 	}
 
     /**

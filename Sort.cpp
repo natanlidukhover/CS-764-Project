@@ -82,24 +82,25 @@ int partition(uint8_t *data, int startRow, int endRow, int rowSize) {
 	return i;
 }
 
-void qs(uint8_t *data, size_t startRow, size_t endRow, size_t rowSize) {
+void qs(uint8_t *data, int startRow, int endRow, int rowSize) {
 	int pivot;
 	if (startRow >= endRow || startRow < 0)
 		return;
 	pivot = partition(data, startRow, endRow, rowSize);
-	qs(dataRow, startRow, pivot - 1, rowSize);
-	qs(dataRow, pivot + 1, endRow, rowSize);
+
+	qs(data, startRow, pivot - 1, rowSize);
+	qs(data, pivot + 1, endRow, rowSize);
 }
 
-void quickSort(uint8_t *data, size_t numRows, size_t rowSize) {
+void quickSort(uint8_t *data, int numRows, int rowSize) {
 	qs(data, 0, numRows - 1, rowSize);
 }
 
-void verifySortedRuns(uint8_t *data, int numRows, size_t rowSize) {
+void verifySortedRuns(uint8_t *data, int endRow, int rowSize) {
 	int col = 0;
 	int cmp_col;
 	int startRow = 0;
-	for (int i = startRow + 1; i <= endRow; i++) {
+	for (int i = startRow + 1; i < endRow; i++) {
 		cmp_col = col;
 		while (data[i * rowSize + cmp_col] == data[(i - 1) * rowSize + cmp_col]) {
 			cmp_col = (cmp_col + 1) % rowSize;

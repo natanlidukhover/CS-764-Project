@@ -24,5 +24,5 @@ private:
 	RowCount _consumed, _produced;
 }; // class SortIterator
 
-void quickSort(uint8_t *data, size_t numRows, size_t rowSize);
-void verifySortedRuns(uint8_t *data, int numRows, size_t rowSize);
+void quickSort(uint8_t *data, int numRows, int rowSize);
+void verifySortedRuns(uint8_t *data, int numRows, int rowSize);
