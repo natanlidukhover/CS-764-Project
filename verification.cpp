@@ -4,8 +4,8 @@
 #include <string>
 #include <fstream>
 #include <set>
-
-void verifySortedRuns(const std::string &sortedFilePath, const std::string &unsortedFilePath, size_t pageSize, size_t rowSize, size_t totalUnsortedRows) {
+#define cout outTrace
+void verify(const std::string &sortedFilePath, const std::string &unsortedFilePath, size_t pageSize, size_t rowSize, size_t totalUnsortedRows) {
     std::ifstream sortedFile(sortedFilePath, std::ios::binary);
     std::ifstream unsortedFile(unsortedFilePath, std::ios::binary);
 
@@ -57,7 +57,7 @@ void verifySortedRuns(const std::string &sortedFilePath, const std::string &unso
         }
     }
 
-    std::cout << "Verification Successful" << std::endl;
-    std::cout << "Pages verified: " << pageCount << std::endl;
-    std::cout << "Rows verified: " << rowReadCount << std::endl;
+    cout << "Verification Successful" << std::endl;
+    cout << "Pages verified: " << pageCount << std::endl;
+    cout << "Rows verified: " << rowReadCount << std::endl;
 }
