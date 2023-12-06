@@ -28,13 +28,11 @@ Ssd::~Ssd() {
 * @returns The number of bytes written. If we reach end of file, then we return 0
 */
 int Ssd::writeData(const void* data, size_t seek) {
-    TRACE(true);
-
     if (seek + _blockSize > _size) {
         cout << "Found less size to write, hence exiting.Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage" << _size << endl;  
         return 0;
     }
-    cout << "Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage " << _size << " Filepointer" << filePtr << endl;  
+    // cout << "Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage " << _size << " Filepointer" << filePtr << endl;  
     fseek(filePtr, seek, SEEK_SET);
     size_t written = fwrite(data, 1, _blockSize, filePtr);
     _writeCount = _writeCount + 1;

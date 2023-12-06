@@ -1,5 +1,7 @@
 #include "Sort.h"
 #include <iostream>
+#include "defs.h"
+#define cout outTrace
 
 // SortPlan::SortPlan (Plan * const input) : _input (input)
 // {
@@ -108,8 +110,9 @@ void verifySortedRuns(uint8_t *data, int endRow, int rowSize) {
 				break;
 		}
 		if (data[i * rowSize + cmp_col] < data[(i - 1) * rowSize + cmp_col]) {
-			std::cout << "unsorted at row:" << i << std::endl;
+			cout << "unsorted at row:" << i << std::endl;
 			return;
 		}
 	}
+	cout << "Verification of data successfull!" << endl;
 }

@@ -39,20 +39,19 @@ int main(int argc, char* argv[]) {
 	//for hdd blockSize is given by bandwidth * latency = 100*0.01
 	Ssd *  unsorted_hdd = new Ssd("./input/testData.bin",(size_t)number_of_records*row_size, blockSize);
     Ssd *  sorted_hdd = new Ssd("./output/testData.bin",(size_t)number_of_records*row_size, blockSize);	
-	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records));
+	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (number_of_records*row_size));
 	vector<int> numbers = sc_it->run();
 	
 	uint8_t *data = (uint8_t *)dram.getSpace(1 * pow(10, 6));
     //Run initRun(unsorted_hdd, data, (size_t)(1 * 1e6), (size_t)0, number_of_records * row_size, number_of_records * row_size, (size_t)1e6, row_size, (size_t)0);
 	for (size_t i = 0; i < number_of_records * row_size; i += blockSize) {
 		int bytesread = unsorted_hdd->readData(data + i, i);
-		cout << bytesread << endl;
 	}
 	for (size_t i = 0; i < number_of_records; i++) {
         //initRun.getNext(&row);
 		for (size_t j = 0; j < row_size; j++) {
             //tmp[i][j] = row[j];
-			cout << data[i * row_size + j];
+			cout << (int)data[i * row_size + j];
 			cout << " ";
 		}
 		cout << "\n";

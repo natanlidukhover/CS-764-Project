@@ -71,7 +71,7 @@ std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
         int random_number = dis(gen);
         intVector.push_back(random_number); // Appending a random number
     }
-    cout << "Generated " << numberOfIntegers << " bytes of random data\n";
+    //cout << "Generated " << numberOfIntegers << " bytes of random data\n";
     return intVector;
 }
 
@@ -100,7 +100,7 @@ void ScanIterator::saveIntegersToBinaryFile(const std::vector<int>& numbers, con
     std::ifstream inFile(filename, std::ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
 	    TRACE(true);
-    cout << fileSize << " bytes written to file" << filename << std::endl;
+    //cout << fileSize << " bytes written to file" << filename << std::endl;
     inFile.close();
     }
 
@@ -118,7 +118,7 @@ vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
 	    TRACE(true);
-    cout << "Size of input file is "<< fileSize << " bytes" << std::endl;
+    //cout << "Size of input file is "<< fileSize << " bytes" << std::endl;
     //seekg used as ate mode moves it to end of file
     inFile.seekg(0, ios::beg);
     while(numberOfRecordsToRead > 0)
