@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 	uint8_t *dataPtr;
 
 	// all constants
-	numRecords = 4;
+	numRecords = 10;
 	rowSize = 5;
 	blockSize = 5;
 	dramRunSize = blockSize;
@@ -37,16 +37,16 @@ int main(int argc, char* argv[]) {
 
 	Ssd ssd("./input/testData.bin", (size_t) numRecords * rowSize, blockSize);
 	Ssd ossd("./output/testData.bin", (size_t) numRecords * rowSize, blockSize);
-	//ScanIterator * const sc_it = new ScanIterator(new ScanPlan (numRecords * rowSize, blockSize));
-	//vector<int> numbers = sc_it->run();
+	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (numRecords * rowSize, blockSize));
+	vector<int> numbers = sc_it->run();
 
-	//for (size_t i = 0; i < numRecords; i++) {
-	//	for (size_t j = 0; j < rowSize; j++) {
-	//		cout << (int)numbers[i * rowSize + j] << " ";
-	//	}
-	//	cout << endl;
-	//}
-	//cout << endl;
+	for (size_t i = 0; i < numRecords; i++) {
+		for (size_t j = 0; j < rowSize; j++) {
+			cout << (int)numbers[i * rowSize + j] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
 
 	Run **runs;
 	runs = (Run **)malloc(sizeof(Run *) * nor);
@@ -75,10 +75,18 @@ int main(int argc, char* argv[]) {
 
 	ETable t(numRecords, rowSize, rowSize, 0);
 	TOL tol(nor, runs, &outputRun, t);
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < nor + 1; i++) {
 		cout << "-----------------------Pass " << i << " ----------------------------" << endl;
 		tol.print();
 		tol.pass();
+	}
+	for (int i = 0; i < nor; i++) {
+		uint8_t *ptr;
+		outputRun.getNext(&ptr);
+		for (int j = 0; j < rowSize; j++) {
+			cout << (int)ptr[j] << " ";
+		}
+		cout << endl;
 	}
 
 	free(runs);

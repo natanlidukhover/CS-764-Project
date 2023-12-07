@@ -499,7 +499,7 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 	for (size_t i = 0; i <= (lastLeaf - firstLeaf); i++) {
 		int li = firstLeaf + i;
 		nodeList[li].index = li;
-		if (i > nor) {
+		if (i >= nor) {
 			nodeList[li].nodeType = NT_LINF;
 			nodeList[li].key = NULL;
 			nodeList[li].r = NULL;
