@@ -1,19 +1,50 @@
-# CS764-Project
+Deliverables:
 
-## Steps to Run
+Your submission should be a zip file that includes:
 
-Compile the project using make command
-Test.cpp is the entry point, hence run ./Test.exe after compilation
+Your full source code with clear documentations
 
-## Contributors
+A makefile that compiles all your executables
 
-- Natan
+And README file that includes: 
+
+    Each group member's names and student IDs
+
+    The techniques (see Grading) implemented by your submission and the corresponding source files and lines
+
+    A brief writeup of (1) the reasons you chose to implement the specific subset of techniques (2) the project's state (complete or have what kinds of bugs) (3) how to run your programs if they are different from the default specifications above. This is not expected to be a lengthy document, just to assist our understandings of your work.
+
+    Each group member's contributions to the project
+    
+
+Group Members:
+
 - Shivam Hire
-- Smit Shah
 - Tyler Wilson
+- Natan Lidukhover
+- Smit Shah
 
-## Method Documentation
+Techniques Implemented: 
 
-Ssd->writeData(const void \* data, size_t offset)
-Write data at that particular offset. The caller will decide what data needs to be passed
-and the offset where it needs to be written. It will write _blockSize amount of data. 
+- Quicksort:
+	We chose to implement quicksort for cache sized sorting only.
+	
+- Tournament Tree:
+	Used during merge sort with OVC to increase speed and efficiency.
+	
+- Minimum count of row & column comparisons
+
+- Cache sized mini runs:
+	See 
+- Device optimized page sizes
+- Verifying sets of rows and values/sort order
+- Variable size records
+- Offset value coding
+- Compression
+- Prefix truncation
+- run size > memory size
+- Spilling memory to SSD
+- Spilling from SSD to Disk
+- Graceful degradation
+- 
+
