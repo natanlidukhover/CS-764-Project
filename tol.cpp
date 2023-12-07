@@ -135,7 +135,7 @@ size_t Run::getBufferSize()
 }
 
 ETable::ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey
-		= 0):_NumRows(NumRows), _NumCols(NumCols), _RecordSize(RecordSize),
+		= 0):_NumRows(NumRows), _NumCols(NumCols), _RecordSize(RecordSize),_rowSize(RecordSize),
 	_SortKey(SortKey)
 {
 }
@@ -146,12 +146,16 @@ ETable::ETable(const ETable &_t)
 	_NumCols = _t._NumCols;
 	_RecordSize = _t._RecordSize;
 	_SortKey = _t._SortKey;
+	_rowSize = _t._rowSize;
 }
 
 ETable::~ETable()
 {
 }
 
+/**
+ * Used for setting parent of internal nodes
+*/
 void TOL::setWWinner(Node &curr, Node &n) {
 	curr.winnerIndex = n.winnerIndex;
 	curr.winnerNT = n.winnerNT;
@@ -159,6 +163,10 @@ void TOL::setWWinner(Node &curr, Node &n) {
 	curr.winnerR = n.winnerR;
 	curr.winnerOVC = n.winnerOVC;
 }
+
+/**
+ * Used for setting parent of leaf nodes
+*/
 
 void TOL::setWinner(Node &curr, Node &n) {
 	curr.winnerIndex = n.index;
@@ -168,6 +176,9 @@ void TOL::setWinner(Node &curr, Node &n) {
 	curr.winnerOVC = n.ovc;
 }
 
+/**
+ * Used for setting parent of internal nodes
+*/
 void TOL::setWLoser(Node &curr, Node &n) {
 	curr.index = n.winnerIndex;
 	curr.nodeType = n.winnerNT;
@@ -176,6 +187,9 @@ void TOL::setWLoser(Node &curr, Node &n) {
 	curr.ovc = n.winnerOVC;
 }
 
+/**
+ * Used for setting parent of leaf nodes
+*/
 void TOL::setLoser(Node &curr, Node &n) {
 	curr.index = n.index;
 	curr.nodeType = n.nodeType;
@@ -362,6 +376,7 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		curr.winnerR = l.r;
 		curr.winnerOVC = l.ovc;
 	} else {
+		cout << "IncmpINodes going to calculate winner" << endl ;
 		calculateIWinner(curr, l, r);
 	}
 }
@@ -382,8 +397,10 @@ void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
 	// winner is store in winnerKey and winnerR
 	if (l.nodeType == NT_LEAF || l.nodeType == NT_LINF)
 		cmpLeafNodes(curr, l, r);
-	else
+	else{
 		cmpINodes(curr, l, r);
+	}
+		
 }
 
 int TOL::pass() {
@@ -452,11 +469,15 @@ void TOL::print() {
 	}
 }
 
-TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor), t(_t) {
+TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor),t(_t) {
 	if (nor > 256) {
 		throw std::runtime_error("TOL doesn't fit in cache");
 	}
-
+	t._NumRows = _t._NumRows;
+	t._NumCols = _t._NumCols;
+	t._RecordSize = _t._RecordSize;
+	t._SortKey = _t._SortKey;
+	t._rowSize = _t._rowSize;
 	int tol_height = ceil(log2(nor)) + 1;
 	numNodes = pow(2, tol_height) - 1;
 	nodeList = new Node[numNodes];
@@ -493,7 +514,7 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 	}
 
 	// init internal nodes
-	for (int i = tol_height - 1; i >= 0; i--) {
+	for (int i = tol_height - 1; i > 0; i--) {
 		// init all nodes at each height
 		int firstNode = pow(2, i - 1) - 1;
 		int lastNode = pow(2, i) - 2;
