@@ -15,12 +15,12 @@ HDRS=	defs.h \
 		Dram.h Table.h tol.h Ssd.h verification.h
 SRCS=	defs.cpp Assert.cpp Test.cpp \
 		Iterator.cpp Scan.cpp Filter.cpp Sort.cpp \
-		Dram.cpp Table.cpp tol.cpp Ssd.cpp Main.cpp verification.cpp
+		Dram.cpp Table.cpp tol.cpp Ssd.cpp Main.cpp verification.cpp test_tol.cpp
 
 # compilation targets
 OBJS=	defs.o Assert.o Test.o \
 		Iterator.o Scan.o Filter.o Sort.o \
-		Dram.o Table.o tol.o Ssd.o Main.o verification.o
+		Dram.o Table.o tol.o Ssd.o Main.o verification.o test_tol.o
 
 # RCS assists
 REV=-q -f
