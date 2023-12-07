@@ -14,7 +14,7 @@
 
 using namespace std;
 using namespace std::chrono;
-int main(int argc, char* argv[]) {
+int main1(int argc, char* argv[]) {
 	auto start_main = high_resolution_clock::now();
     // Default values
    	size_t number_of_records = 1e7;

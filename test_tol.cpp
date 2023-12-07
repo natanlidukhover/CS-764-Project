@@ -11,8 +11,8 @@
 #include "tol.h"
 
 using namespace std;
-int main1(int argc, char* argv[]) {
-	size_t nor, dramRunSize, rowSize, numRecords, blockSize;
+int main(int argc, char* argv[]) {
+	size_t nor, dramRunSize, rowSize, numRecords, blockSize, hddRunSize;
 	uint8_t *dataPtr;
 
 	// all constants
@@ -21,6 +21,7 @@ int main1(int argc, char* argv[]) {
 	blockSize = 5;
 	dramRunSize = blockSize;
 	nor = (numRecords * rowSize)/dramRunSize;
+	hddRunSize = (numRecords * rowSize)/nor;
 
 	outTrace.open("o.txt",  std::ios_base::out );
     TRACE(true);
@@ -36,22 +37,22 @@ int main1(int argc, char* argv[]) {
 
 	Ssd ssd("./input/testData.bin", (size_t) numRecords * rowSize, blockSize);
 	Ssd ossd("./output/testData.bin", (size_t) numRecords * rowSize, blockSize);
-	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (numRecords * rowSize, blockSize));
-	vector<int> numbers = sc_it->run();
+	//ScanIterator * const sc_it = new ScanIterator(new ScanPlan (numRecords * rowSize, blockSize));
+	//vector<int> numbers = sc_it->run();
 
-	for (size_t i = 0; i < numRecords; i++) {
-		for (size_t j = 0; j < rowSize; j++) {
-			cout << (int)numbers[i * rowSize + j] << " ";
-		}
-		cout << endl;
-	}
-	cout << endl;
+	//for (size_t i = 0; i < numRecords; i++) {
+	//	for (size_t j = 0; j < rowSize; j++) {
+	//		cout << (int)numbers[i * rowSize + j] << " ";
+	//	}
+	//	cout << endl;
+	//}
+	//cout << endl;
 
 	Run **runs;
 	runs = (Run **)malloc(sizeof(Run *) * nor);
 
 	for (size_t i = 0; i < nor; i++) {
-		runs[i] = new Run(&ssd, &(dataPtr[dramRunSize * i]), blockSize, ((numRecords * rowSize)/nor) * i, numRecords * rowSize, numRecords * rowSize, dramRunSize, rowSize, 0);
+		runs[i] = new Run(&ssd, &(dataPtr[dramRunSize * i]), blockSize, hddRunSize * i, hddRunSize, numRecords * rowSize, dramRunSize, rowSize, 0);
 	}
 	Run outputRun(&ossd, &(dataPtr[dramRunSize * nor]), blockSize, 0, 0, numRecords * rowSize, dramRunSize, rowSize, 0);
 
@@ -74,9 +75,10 @@ int main1(int argc, char* argv[]) {
 
 	ETable t(numRecords, rowSize, rowSize, 0);
 	TOL tol(nor, runs, &outputRun, t);
-	tol.print();
-	tol.pass();
-	tol.print();
+	for (int i = 0; i < 4; i++) {
+		tol.print();
+		tol.pass();
+	}
 
 	free(runs);
 	free(dataPtr);

@@ -49,7 +49,7 @@ public:
 #define NT_LEAF		(1)
 #define NT_EMPTY	(2)
 #define NT_LINF		(3)
-#define NT_INF		(3)
+#define NT_INF		(4)
 #define INV			(-1)
 
 class Node
@@ -95,6 +95,7 @@ private:
 	void cmpLeafNodes(Node &curr, Node &l, Node &r);
 	void cmpINodes(Node &curr, Node &l, Node &r);
 	void cmpNodes(Node &curr, Node &l, Node &r);
+	void clearWinner(Node &n);
 public:
 	TOL(size_t nor, Run **rl, Run *o, ETable _t);
 	~TOL();

@@ -184,6 +184,14 @@ void TOL::setLoser(Node &curr, Node &n) {
 	curr.ovc = n.ovc;
 }
 
+void TOL::clearWinner(Node &n) {
+	n.winnerIndex = INV;
+	n.winnerNT = NT_EMPTY;
+	n.winnerKey = NULL;
+	n.winnerR = NULL;
+	n.winnerOVC = INV;
+}
+
 /**
  * Its assume that none of curr, l and r is INF or EMPTY node
 */
@@ -334,12 +342,12 @@ void TOL::cmpLeafNodes(Node &curr, Node &l, Node &r) {
 }
 
 void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
-	if (l.nodeType == NT_INF && r.nodeType == NT_INF) {
+	if (l.winnerNT == NT_INF && r.winnerNT == NT_INF) {
 		curr.nodeType = curr.winnerNT = NT_INF;
 		curr.key = curr.winnerKey = NULL;
 		curr.r = curr.winnerR = NULL;
 		curr.ovc = curr.winnerOVC = INV;
-	} else if (l.nodeType == NT_INF) {
+	} else if (l.winnerNT == NT_INF) {
 		curr.nodeType = NT_INF;
 		curr.key = NULL;
 		curr.r = NULL;
@@ -350,7 +358,7 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		curr.winnerKey = r.key;
 		curr.winnerR = r.r;
 		curr.winnerOVC = r.ovc;
-	} else if (r.nodeType == NT_INF) {
+	} else if (r.winnerNT == NT_INF) {
 		curr.nodeType = NT_INF;
 		curr.key = NULL;
 		curr.r = NULL;
@@ -364,6 +372,9 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 	} else {
 		calculateIWinner(curr, l, r);
 	}
+	// TODO uncomment below lines
+	//clearWinner(l);
+	//clearWinner(r);
 }
 
 void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
@@ -392,7 +403,7 @@ int TOL::pass() {
 		return EINF;
 	}
 	// Store current winner
-	int ret = output->setNext(nodeList[0].key);
+	int ret = output->setNext(nodeList[0].winnerKey);
 	if (ret != SUCCESS) {
 		return ret;
 	}
