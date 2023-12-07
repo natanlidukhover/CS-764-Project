@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdexcept>
 #include <cstring>
+#include <iostream>
 
 // TODO change these APIs to read and write any number of data
 
@@ -151,6 +152,14 @@ ETable::~ETable()
 {
 }
 
+void TOL::setWWinner(Node &curr, Node &n) {
+	curr.winnerIndex = n.winnerIndex;
+	curr.winnerNT = n.winnerNT;
+	curr.winnerKey = n.winnerKey;
+	curr.winnerR = n.winnerR;
+	curr.winnerOVC = n.winnerOVC;
+}
+
 void TOL::setWinner(Node &curr, Node &n) {
 	curr.winnerIndex = n.index;
 	curr.winnerNT = n.nodeType;
@@ -159,12 +168,78 @@ void TOL::setWinner(Node &curr, Node &n) {
 	curr.winnerOVC = n.ovc;
 }
 
+void TOL::setWLoser(Node &curr, Node &n) {
+	curr.index = n.winnerIndex;
+	curr.nodeType = n.winnerNT;
+	curr.key = n.winnerKey;
+	curr.r = n.winnerR;
+	curr.ovc = n.winnerOVC;
+}
+
 void TOL::setLoser(Node &curr, Node &n) {
 	curr.index = n.index;
 	curr.nodeType = n.nodeType;
 	curr.key = n.key;
 	curr.r = n.r;
 	curr.ovc = n.ovc;
+}
+
+/**
+ * Its assume that none of curr, l and r is INF or EMPTY node
+*/
+void TOL::calculateIWinner(Node &curr, Node &l, Node &r, size_t domain = 10, size_t arity = 0, bool isAscending = true) {
+	if (arity == 0)
+		arity = t._rowSize;
+	// TODO compare using OVC
+	if (l.winnerOVC != INV && r.winnerOVC != INV) {
+		if (l.winnerOVC != r.winnerOVC) {
+			// TODO check if these conditions are correct
+			if (l.winnerOVC < r.winnerOVC) {
+				setWWinner(curr, l);
+				setWLoser(curr, r);
+			} else {
+				setWWinner(curr, r);
+				setWLoser(curr, l);
+			}
+			curr.nodeType = NT_INODE;
+			return;
+		}
+	}
+	// If OVC comparison fail, compare whole row
+	unsigned short offset = t._rowSize;
+	unsigned short value = domain;
+	uint8_t *prevRow = l.winnerKey;
+	uint8_t *currentRow = r.winnerKey;
+	for (unsigned short i = 0; i < t._rowSize; i++) {
+		if (currentRow[i] != prevRow[i]) {
+			offset = i;
+			if (currentRow[i] < prevRow[i]) {
+				value = prevRow[i];
+				setWWinner(curr, r);
+				setWLoser(curr, l);
+			} else {
+				value = currentRow[i];
+				setWWinner(curr, l);
+				setWLoser(curr, r);
+			}
+			curr.nodeType = NT_INODE;
+			break;
+		}
+	}
+
+	if (isAscending) {
+		offset = arity - offset;
+	} else {
+		value = domain - value;
+	}
+
+	// E.g. domain is 1 to 99 -> 100; offset is 3; value is 94 (domain 100 - actual value of 6);
+	// zerosInDomain = floor(log10(abs(100))) = floor(2) = 2;
+	// offsetValueCode = offset * 10^2 + value = 3 * 100 + 94 = 300 + 94 = 394
+	unsigned short zerosInDomain = floor(log10(domain));
+	unsigned short offsetValueCode = offset * pow(10, zerosInDomain);
+
+	curr.ovc = offsetValueCode + value;
 }
 
 /**
@@ -287,7 +362,7 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		curr.winnerR = l.r;
 		curr.winnerOVC = l.ovc;
 	} else {
-		calculateLeafWinner(curr, l, r);
+		calculateIWinner(curr, l, r);
 	}
 }
 
@@ -322,7 +397,7 @@ int TOL::pass() {
 		return ret;
 	}
 	// Set next key in the root winner's run to be the value at that run's leaf
-	int leafIndex = nodeList[0].winnerIndex;
+	size_t leafIndex = nodeList[0].winnerIndex;
 	ret = (nodeList[0].winnerR)->getNext(&nodeList[leafIndex].key);
 	if (ret != SUCCESS) {
 		// If the run is exhausted, the leaf node should be infinite
@@ -332,12 +407,46 @@ int TOL::pass() {
 		nodeList[leafIndex].ovc = INV;
 	}
 	// Compare the children of the current node where current node is the parent of the updated leaf all the way up the tree
-	int parentNodeIndex = (leafIndex - 1) / 2;
+	size_t parentNodeIndex = (leafIndex - 1) / 2;
 	while (parentNodeIndex >= 0) {
 		cmpNodes(nodeList[parentNodeIndex], nodeList[2 * parentNodeIndex + 1], nodeList[2 * parentNodeIndex + 2]);
 		parentNodeIndex = (parentNodeIndex - 1) / 2;
 	}
 	return SUCCESS;
+}
+
+void TOL::print() {
+	size_t tol_height = ceil(log2(numOfRun)) + 1;
+	for (size_t i = 1; i <= tol_height; i++) {
+		size_t firstNode = pow(2, i - 1) - 1;
+		size_t lastNode = pow(2, i) - 2;
+		for (size_t j = firstNode; j <= lastNode; j++) {
+			std::cout << "node index: " << j << endl;
+			std::cout << "nodeType: " << nodeList[j].nodeType << endl;
+			std::cout << "key: " << endl;
+			if (nodeList[j].nodeType == NT_INODE || nodeList[j].nodeType == NT_LEAF) {
+				for (size_t k = 0; k < this->t._RecordSize; k++) {
+					std::cout << (int)nodeList[j].key[k] << " ";
+				}
+				std::cout << endl;
+			}
+			std::cout << "run: " << nodeList[j].r << endl;
+			std::cout << "ovc: " << nodeList[j].ovc << endl;
+
+			std::cout << "winnerIndex: " << nodeList[j].winnerIndex << endl;
+			std::cout << "winnerNT: " << nodeList[j].winnerNT << endl;
+			std::cout << "winnerKey: " << endl;
+			if (nodeList[j].winnerNT == NT_INODE || nodeList[j].winnerNT == NT_LEAF) {
+				for (size_t k = 0; k < this->t._RecordSize; k++) {
+					std::cout << (int)nodeList[j].winnerKey[k] << " ";
+				}
+				std::cout << endl;
+			}
+			std::cout << "winnerR: " << nodeList[j].winnerR << endl;
+			std::cout << "winnerOVC: " << nodeList[j].winnerOVC << endl;
+			std::cout << endl;
+		}
+	}
 }
 
 TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor), t(_t) {
@@ -352,7 +461,7 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 	// init leaf nodes
 	size_t firstLeaf = pow(2, tol_height - 1) - 1;
 	size_t lastLeaf = pow(2, tol_height) - 2;
-	for (size_t i = 0; i < (lastLeaf - firstLeaf); i++) {
+	for (size_t i = 0; i <= (lastLeaf - firstLeaf); i++) {
 		int li = firstLeaf + i;
 		nodeList[li].index = li;
 		if (i > nor) {
@@ -394,6 +503,7 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 			nodeList[ni].r = NULL;
 			nodeList[ni].ovc = INV;
 
+			nodeList[ni].winnerIndex = INV;
 			nodeList[ni].winnerNT = NT_EMPTY;
 			nodeList[ni].winnerKey = NULL;
 			nodeList[ni].winnerR = NULL;
