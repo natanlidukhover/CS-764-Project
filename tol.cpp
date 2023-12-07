@@ -367,22 +367,22 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		curr.r = NULL;
 		curr.ovc = INV;
 
-		curr.winnerIndex = r.index;
+		curr.winnerIndex = r.winnerIndex;
 		curr.winnerNT = NT_INODE;
-		curr.winnerKey = r.key;
-		curr.winnerR = r.r;
-		curr.winnerOVC = r.ovc;
+		curr.winnerKey = r.winnerKey;
+		curr.winnerR = r.winnerR;
+		curr.winnerOVC = r.winnerOVC;
 	} else if (r.winnerNT == NT_INF) {
 		curr.nodeType = NT_INF;
 		curr.key = NULL;
 		curr.r = NULL;
 		curr.ovc = INV;
 
-		curr.winnerIndex = l.index;
+		curr.winnerIndex = l.winnerIndex;
 		curr.winnerNT = NT_INODE;
-		curr.winnerKey = l.key;
-		curr.winnerR = l.r;
-		curr.winnerOVC = l.ovc;
+		curr.winnerKey = l.winnerKey;
+		curr.winnerR = l.winnerR;
+		curr.winnerOVC = l.winnerOVC;
 	} else {
 		cout << "IncmpINodes going to calculate winner" << endl ;
 		calculateIWinner(curr, l, r);
@@ -416,7 +416,7 @@ void TOL::cmpNodes(Node &curr, Node &l, Node &r) {
 
 int TOL::pass() {
 	// Check for infinite case
-	if (nodeList[0].nodeType == NT_INF) {
+	if (nodeList[0].winnerNT == NT_INF) {
 		return EINF;
 	}
 	// Store current winner

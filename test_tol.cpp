@@ -75,7 +75,8 @@ int main(int argc, char* argv[]) {
 
 	ETable t(numRecords, rowSize, rowSize, 0);
 	TOL tol(nor, runs, &outputRun, t);
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 5; i++) {
+		cout << "-----------------------Pass " << i << " ----------------------------" << endl;
 		tol.print();
 		tol.pass();
 	}
