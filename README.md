@@ -6,7 +6,7 @@ Your full source code with clear documentations
 
 A makefile that compiles all your executables
 
-And README file that includes: 
+And README file that includes:
 
     Each group member's names and student IDs
 
@@ -15,7 +15,6 @@ And README file that includes:
     A brief writeup of (1) the reasons you chose to implement the specific subset of techniques (2) the project's state (complete or have what kinds of bugs) (3) how to run your programs if they are different from the default specifications above. This is not expected to be a lengthy document, just to assist our understandings of your work.
 
     Each group member's contributions to the project
-    
 
 Group Members:
 
@@ -24,27 +23,27 @@ Group Members:
 - Natan Lidukhover
 - Smit Shah
 
-Techniques Implemented: 
+Techniques Implemented(Filename in code):
 
-- Quicksort:
-	We chose to implement quicksort for cache sized sorting only.
-	
-- Tournament Tree:
-	Used during merge sort with OVC to increase speed and efficiency.
-	
-- Minimum count of row & column comparisons
+- Quicksort(Sort.cpp::_quickSort()_):
+  We chose to implement quicksort for cache sized sorting only.
+- Tournament Tree(tol.cpp::Class TOL):
+  Used during merge sort with OVC to increase speed and efficiency.
+- Run size > memory size?
+  Implemented during RunGeneration
+- Offset value coding (tol.cpp::Class TOL)
+  Helps in optimizing comparisons
 
-- Cache sized mini runs:
-	See 
-- Device optimized page sizes
+- Minimum count of row & column comparisons (tol.cpp::Class TOL)
+  Implemented in TreeOfLosers
+- Cache sized mini runs (tol.cpp::Class Run):
+  Implemented using getNext and setNext methods
+- Device optimized page sizes(Main.cpp::blockSize variable)
 - Verifying sets of rows and values/sort order
 - Variable size records
-- Offset value coding
-- Compression
-- Prefix truncation
+
 - run size > memory size
 - Spilling memory to SSD
 - Spilling from SSD to Disk
 - Graceful degradation
-- 
-
+-
