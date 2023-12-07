@@ -151,9 +151,9 @@ vector<int> ScanIterator::run ()
         // open the file in truncate mode for the first chunk and then open it in append mode
         // Hence we pass a flag isAppendOnly whose vaue is i which will be false when it is the first run(i=0)
         this->saveIntegersToBinaryFile(currChunk, this->file, i);
-        if(i % (blocks/100) == 0 && i!=0){
-            cout << "Written" << i * blockSize <<"bytes to the file " << this->file << "\n";
-        }    
+        // if(i % (blocks/100) == 0 && i!=0){
+        //     cout << "Written" << i * blockSize <<"bytes to the file " << this->file << "\n";
+        // }    
     }
     size_t remaining = countOfBytes % blockSize;
     if(remaining != 0)
