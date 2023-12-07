@@ -43,6 +43,7 @@ public:
 	int setNext(uint8_t *key);
 	uint8_t *getBuf();										// Get DRAM buffer
 	size_t getBufferSize();
+	int flush();
 };
 
 #define NT_INODE	(0)

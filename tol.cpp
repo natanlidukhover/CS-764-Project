@@ -124,6 +124,17 @@ int Run::setNext(uint8_t *key)
 	return SUCCESS;
 }
 
+int Run::flush()
+{
+	int ret = SUCCESS;
+	if((ret = source->setNext(runBufferSize)) == SUCCESS) {
+		head = 0;
+		tail = 0;
+	} else {
+		return ret;
+	}
+}
+
 uint8_t *Run::getBuf()
 {
 	return source->d;

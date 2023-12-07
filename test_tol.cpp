@@ -80,6 +80,7 @@ int main(int argc, char* argv[]) {
 		tol.print();
 		tol.pass();
 	}
+	outputRun.flush();
 	for (int i = 0; i < nor; i++) {
 		uint8_t *ptr;
 		outputRun.getNext(&ptr);
