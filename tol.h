@@ -70,6 +70,7 @@ class Node
 
 class ETable
 {
+	friend class TOL;
 public:
 	ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey);
 	ETable(const ETable &_t);
@@ -87,14 +88,18 @@ class TOL {
 private:
 	void setWinner(Node &curr, Node &n);
 	void setLoser(Node &curr, Node &n);
+	void setWWinner(Node &curr, Node &n);
+	void setWLoser(Node &curr, Node &n);
 	void calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain, size_t arity, bool isAscending);
+	void calculateIWinner(Node &curr, Node &l, Node &r, size_t domain, size_t arity, bool isAscending);
 	void cmpLeafNodes(Node &curr, Node &l, Node &r);
 	void cmpINodes(Node &curr, Node &l, Node &r);
 	void cmpNodes(Node &curr, Node &l, Node &r);
-	int pass();
 public:
 	TOL(size_t nor, Run **rl, Run *o, ETable _t);
 	~TOL();
+	void print();
+	int pass();
 };
 
 // Leaf: Should have info about where to get next part of run
