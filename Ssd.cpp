@@ -35,6 +35,7 @@ int Ssd::writeData(const void* data, size_t seek) {
     // cout << "Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage " << _size << " Filepointer" << filePtr << endl;  
     fseek(filePtr, seek, SEEK_SET);
     size_t written = fwrite(data, 1, _blockSize, filePtr);
+    fflush((filePtr));
     _writeCount = _writeCount + 1;
     return written;
 }

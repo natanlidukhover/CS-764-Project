@@ -13,7 +13,7 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
         std::cerr << "Error opening files." << std::endl;
         return;
     }
-
+    
     std::vector<uint8_t> buffer(rowSize);
     std::set<std::vector<uint8_t> > sortedDataSet;
 
@@ -21,7 +21,7 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
     std::vector<uint8_t> previousRow;
     while (sortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
         std::vector<uint8_t> currentRow(buffer);
-
+        
         if (!previousRow.empty() && currentRow < previousRow) {
             std::cerr << "Sorted data is not sorted correctly." << std::endl;
             return;
@@ -29,7 +29,9 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
 
         sortedDataSet.insert(currentRow);
         previousRow = std::move(currentRow);
+
     }
+
 
     // Iterate through unsorted data page by page
     size_t pageCount = 0;
@@ -47,7 +49,7 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
 }
 
         rowReadCount++;
-        if (rowReadCount % (pageSize / rowSize) == 0) {
+        if (rowReadCount % pageSize == 0) {
             pageCount++;
         }
 

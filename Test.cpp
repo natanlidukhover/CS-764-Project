@@ -17,9 +17,9 @@ using namespace std::chrono;
 int main(int argc, char* argv[]) {
 	auto start_main = high_resolution_clock::now();
     // Default values
-   	size_t number_of_records = 8;
-	size_t row_size = 4;
-	size_t blockSize = 2;
+   	size_t number_of_records = 1e7;
+	size_t row_size = 5;
+	size_t blockSize = 10000;
     std::string o_filename="o.txt";
 
     // Parse command-line arguments
