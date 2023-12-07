@@ -69,7 +69,7 @@ std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
     std::vector<int> intVector;
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<uint8_t> dis(0, 9);
+    std::uniform_int_distribution<uint8_t> dis(0, 255);
 
     // Generate random numbers until the vector reaches the specified total number of integers
     for (int i = 0; i < numberOfIntegers; ++i) {
