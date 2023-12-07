@@ -335,6 +335,9 @@ int TOL::pass() {
 	int parentNodeIndex = (leafIndex - 1) / 2;
 	while (parentNodeIndex >= 0) {
 		cmpNodes(nodeList[parentNodeIndex], nodeList[2 * parentNodeIndex + 1], nodeList[2 * parentNodeIndex + 2]);
+		if (parentNodeIndex == 0) {
+			break;
+		}
 		parentNodeIndex = (parentNodeIndex - 1) / 2;
 	}
 	return SUCCESS;
