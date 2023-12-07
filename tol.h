@@ -35,7 +35,6 @@ class Run
 	size_t head;
 	size_t tail;
 	size_t rowSize;
-	size_t bufferSize;
 public:
 	Run(Ssd *_s, uint8_t *_d, size_t bs, size_t ss, size_t t, size_t ms,
 		size_t rbs, size_t rowsze, size_t dramTail);
