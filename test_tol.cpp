@@ -11,7 +11,7 @@
 #include "tol.h"
 
 using namespace std;
-int main(int argc, char* argv[]) {
+int mainsuck(int argc, char* argv[]) {
 	size_t nor, dramRunSize, rowSize, numRecords, blockSize, hddRunSize;
 	uint8_t *dataPtr;
 
