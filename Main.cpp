@@ -81,8 +81,9 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
     Run** runs = new Run*[numberOfRuns];
     for (size_t i = 0; i < numberOfRuns; i++) {
         size_t minRunSize = std::min(runSize, bytesToFill - (inputStartOffset + (i * runSize)));
-        runs[i] = new Run(inputHdd, inputBuffer + (i * minRunSize), inputBlockSize, inputStartOffset + (i * minRunSize), 0, minRunSize, minRunSize, rowSize, minRunSize);
-        quickSort(inputBuffer + (i * minRunSize), minRunSize / rowSize, rowSize);
+        runs[i] = new Run(inputHdd, inputBuffer + (i * runSize), inputBlockSize, 0, 0, minRunSize, minRunSize, rowSize, minRunSize);
+        quickSort(inputBuffer + (i * runSize), runSize / rowSize, rowSize);
+	    verifySortedRuns(inputBuffer + (i * runSize), runSize / rowSize, rowSize);
     }
     Run* outputRun = new Run(outputDevice, outputBuffer, outputBlockSize, outputStartOffset, 0, bytesToFill, outputBufferSize, rowSize, 0);
 
@@ -93,15 +94,15 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
         tol->pass();
     }
     outputRun->flush();
-    //for (int i = 0; i < numberOfRecords; i++) {
-	//	uint8_t *ptr;
-	//	outputRun->getNext(&ptr);
-	//	cout << "[" << i + 1 << "]";
-	//	for (int j = 0; j < rowSize; j++) {
-	//		cout << (int) ptr[j] << " ";
-	//	}
-	//	cout << endl;
-	//}
+    for (size_t i = 0; i < numberOfRecords; i++) {
+		uint8_t *ptr;
+		outputRun->getNext(&ptr);
+		cout << "[" << i + 1 << "]";
+		for (size_t j = 0; j < rowSize; j++) {
+			cout << (int) ptr[j] << " ";
+		}
+		cout << endl;
+	}
 
     // Free buffers
     dram.freeSpace(outputBuffer, outputBufferSize);
@@ -174,7 +175,8 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
             minRunSize = cacheLastRunSize;
         }
         runs[i] = new Run(inputHdd, dramInputBuffer + (i * cacheRunSize), inputBlockSize, 0, 0, minRunSize, minRunSize, rowSize, minRunSize);
-        quickSort(dramInputBuffer + (i * minRunSize), minRunSize / rowSize, rowSize);
+        quickSort(dramInputBuffer + (i * cacheRunSize), cacheRunSize / rowSize, rowSize);
+	    verifySortedRuns(dramInputBuffer + (i * cacheRunSize), cacheRunSize / rowSize, rowSize);
     }
     for (size_t i = 0; i < numberOfSsdRuns; i++) {
         size_t minRunSize = ssdRunSize;
@@ -193,11 +195,11 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
         tol->pass();
     }
     outputRun->flush();
-    for (int i = 0; i < numberOfRecords; i++) {
+    for (size_t i = 0; i < numberOfRecords; i++) {
 		uint8_t *ptr;
 		outputRun->getNext(&ptr);
 		cout << "[" << i + 1 << "]";
-		for (int j = 0; j < rowSize; j++) {
+		for (size_t j = 0; j < rowSize; j++) {
 			cout << (int) ptr[j] << " ";
 		}
 		cout << endl;
