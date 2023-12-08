@@ -243,7 +243,8 @@ void TOL::calculateIWinner(Node &curr, Node &l, Node &r, size_t domain = 10, siz
 	unsigned short value = domain;
 	uint8_t *prevRow = l.winnerKey;
 	uint8_t *currentRow = r.winnerKey;
-	for (unsigned short i = 0; i < t._rowSize; i++) {
+	size_t i;
+	for (i = 0; i < t._rowSize; i++) {
 		if (currentRow[i] != prevRow[i]) {
 			offset = i;
 			if (currentRow[i] < prevRow[i]) {
@@ -258,6 +259,12 @@ void TOL::calculateIWinner(Node &curr, Node &l, Node &r, size_t domain = 10, siz
 			curr.nodeType = NT_INODE;
 			break;
 		}
+	}
+	if (i == t._rowSize) {
+		curr.ovc = INV;
+		setWinner(curr, r);
+		setLoser(curr, l);
+		return;
 	}
 
 	if (isAscending) {
@@ -301,7 +308,8 @@ void TOL::calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10, 
 	unsigned short value = domain;
 	uint8_t *prevRow = l.key;
 	uint8_t *currentRow = r.key;
-	for (unsigned short i = 0; i < t._rowSize; i++) {
+	size_t i;
+	for (i = 0; i < t._rowSize; i++) {
 		if (currentRow[i] != prevRow[i]) {
 			offset = i;
 			if (currentRow[i] < prevRow[i]) {
@@ -317,6 +325,13 @@ void TOL::calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10, 
 			break;
 		}
 	}
+	if (i == t._rowSize) {
+		curr.ovc = INV;
+		setWinner(curr, r);
+		setLoser(curr, l);
+		return;
+	}
+
 
 	if (isAscending) {
 		offset = arity - offset;
