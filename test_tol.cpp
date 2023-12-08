@@ -16,10 +16,10 @@ int main(int argc, char* argv[]) {
 	uint8_t *dataPtr;
 
 	// all constants
-	numRecords = 10;
+	numRecords = 100;
 	rowSize = 5;
-	blockSize = 5;
-	dramRunSize = blockSize;
+	blockSize = rowSize;
+	dramRunSize = blockSize * 2;
 	nor = (numRecords * rowSize)/dramRunSize;
 	hddRunSize = (numRecords * rowSize)/nor;
 
@@ -40,19 +40,18 @@ int main(int argc, char* argv[]) {
 	ScanIterator * const sc_it = new ScanIterator(new ScanPlan (numRecords * rowSize, blockSize));
 	vector<int> numbers = sc_it->run();
 
-	for (size_t i = 0; i < numRecords; i++) {
-		for (size_t j = 0; j < rowSize; j++) {
-			cout << (int)numbers[i * rowSize + j] << " ";
-		}
-		cout << endl;
-	}
-	cout << endl;
-
 	Run **runs;
 	runs = (Run **)malloc(sizeof(Run *) * nor);
 
+	// read data from persistent storage to dram
+	for (int i = 0; i < numRecords * rowSize; i += blockSize) {
+		ssd.readData(dataPtr + i, i);
+	}
+
 	for (size_t i = 0; i < nor; i++) {
-		runs[i] = new Run(&ssd, &(dataPtr[dramRunSize * i]), blockSize, hddRunSize * i, hddRunSize, numRecords * rowSize, dramRunSize, rowSize, 0);
+		runs[i] = new Run(&ssd, &(dataPtr[dramRunSize * i]), blockSize, hddRunSize * i, 0, numRecords * rowSize, dramRunSize, rowSize, dramRunSize);
+		quickSort(dataPtr + dramRunSize * i, dramRunSize/rowSize, rowSize);
+		verifySortedRuns(dataPtr + dramRunSize * i, dramRunSize/rowSize, rowSize);
 	}
 	Run outputRun(&ossd, &(dataPtr[dramRunSize * nor]), blockSize, 0, 0, numRecords * rowSize, dramRunSize, rowSize, 0);
 
@@ -75,15 +74,24 @@ int main(int argc, char* argv[]) {
 
 	ETable t(numRecords, rowSize, rowSize, 0);
 	TOL tol(nor, runs, &outputRun, t);
-	for (int i = 0; i < nor + 1; i++) {
+	for (int i = 0; i < numRecords + 1; i++) {
 		cout << "-----------------------Pass " << i << " ----------------------------" << endl;
 		tol.print();
 		tol.pass();
 	}
 	outputRun.flush();
-	for (int i = 0; i < nor; i++) {
+	for (size_t i = 0; i < numRecords; i++) {
+		for (size_t j = 0; j < rowSize; j++) {
+			cout << (int)numbers[i * rowSize + j] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	for (int i = 0; i < numRecords; i++) {
 		uint8_t *ptr;
 		outputRun.getNext(&ptr);
+		cout << "[" << i + 1 << "]";
 		for (int j = 0; j < rowSize; j++) {
 			cout << (int)ptr[j] << " ";
 		}
