@@ -257,6 +257,7 @@ void TOL::calculateIWinner(Node &curr, Node &l, Node &r, size_t domain = 10, siz
 				setWLoser(curr, r);
 			}
 			curr.nodeType = NT_INODE;
+			curr.winnerNT = NT_INODE;
 			break;
 		}
 	}
@@ -264,6 +265,8 @@ void TOL::calculateIWinner(Node &curr, Node &l, Node &r, size_t domain = 10, siz
 		curr.ovc = INV;
 		setWinner(curr, r);
 		setLoser(curr, l);
+		curr.nodeType = NT_INODE;
+		curr.winnerNT = NT_INODE;
 		return;
 	}
 
@@ -322,6 +325,7 @@ void TOL::calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10, 
 				setLoser(curr, r);
 			}
 			curr.nodeType = NT_INODE;
+			curr.winnerNT = NT_INODE;
 			break;
 		}
 	}
@@ -329,6 +333,8 @@ void TOL::calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10, 
 		curr.ovc = INV;
 		setWinner(curr, r);
 		setLoser(curr, l);
+		curr.nodeType = NT_INODE;
+		curr.winnerNT = NT_INODE;
 		return;
 	}
 
@@ -350,11 +356,14 @@ void TOL::calculateLeafWinner(Node &curr, Node &l, Node &r, size_t domain = 10, 
 
 void TOL::cmpLeafNodes(Node &curr, Node &l, Node &r) {
 	if (l.nodeType == NT_LINF && r.nodeType == NT_LINF) {
+		curr.index = l.index;
+		curr.winnerIndex = r.index;
 		curr.nodeType = curr.winnerNT = NT_INF;
 		curr.key = curr.winnerKey = NULL;
 		curr.r = curr.winnerR = NULL;
 		curr.ovc = curr.winnerOVC = INV;
 	} else if (l.nodeType == NT_LINF) {
+		curr.index = l.index;
 		curr.nodeType = NT_INF;
 		curr.key = NULL;
 		curr.r = NULL;
@@ -366,6 +375,7 @@ void TOL::cmpLeafNodes(Node &curr, Node &l, Node &r) {
 		curr.winnerR = r.r;
 		curr.winnerOVC = r.ovc;
 	} else if (r.nodeType == NT_LINF) {
+		curr.index = r.index;
 		curr.nodeType = NT_INF;
 		curr.key = NULL;
 		curr.r = NULL;
@@ -383,11 +393,14 @@ void TOL::cmpLeafNodes(Node &curr, Node &l, Node &r) {
 
 void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 	if (l.winnerNT == NT_INF && r.winnerNT == NT_INF) {
+		curr.index = l.index;
+		curr.winnerIndex = r.index;
 		curr.nodeType = curr.winnerNT = NT_INF;
 		curr.key = curr.winnerKey = NULL;
 		curr.r = curr.winnerR = NULL;
 		curr.ovc = curr.winnerOVC = INV;
 	} else if (l.winnerNT == NT_INF) {
+		curr.index = l.index;
 		curr.nodeType = NT_INF;
 		curr.key = NULL;
 		curr.r = NULL;
@@ -399,6 +412,7 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		curr.winnerR = r.winnerR;
 		curr.winnerOVC = r.winnerOVC;
 	} else if (r.winnerNT == NT_INF) {
+		curr.index = r.index;
 		curr.nodeType = NT_INF;
 		curr.key = NULL;
 		curr.r = NULL;
