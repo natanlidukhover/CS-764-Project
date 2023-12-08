@@ -410,7 +410,6 @@ void TOL::cmpINodes(Node &curr, Node &l, Node &r) {
 		curr.winnerR = l.winnerR;
 		curr.winnerOVC = l.winnerOVC;
 	} else {
-		cout << "IncmpINodes going to calculate winner" << endl ;
 		calculateIWinner(curr, l, r);
 	}
 	// TODO uncomment below lines
