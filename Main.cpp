@@ -138,8 +138,8 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
     const size_t dramInputBufferSize = dramLimit - outputBufferSize - (numberOfSsdRuns * ssdBlockSize);
     const size_t ssdActualDataSize = bytesToFill - dramInputBufferSize;
     const size_t numberOfCacheRuns = (dramInputBufferSize / cacheRunSize) + (dramInputBufferSize % cacheRunSize != 0); // Round up
-    const size_t cacheLastRunSize = dramInputBufferSize - (numberOfCacheRuns * cacheRunSize);
-    const size_t ssdLastRunSize = ssdActualDataSize - (numberOfSsdRuns * ssdRunSize);
+    const size_t cacheLastRunSize = dramInputBufferSize - ((numberOfCacheRuns - 1) * cacheRunSize);
+    const size_t ssdLastRunSize = ssdActualDataSize - ((numberOfSsdRuns - 1) * ssdRunSize);
 
     // Perform input-to-SSD sort and merge through DRAM
     size_t inputOffset = inputStartOffset;
