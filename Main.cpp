@@ -86,7 +86,7 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
         if (i == numberOfCacheRuns - 1) {
             minRunSize = cacheLastRunSize;
         }
-        runs[i] = new Run(inputHdd, inputBuffer + (i * cacheRunSize), inputBlockSize, 0, 0, minRunSize, minRunSize, rowSize, minRunSize);
+        runs[i] = new Run(inputHdd, inputBuffer + (i * cacheRunSize), inputBlockSize, 0, 0, cacheRunSize, cacheRunSize, rowSize, cacheRunSize);
         quickSort(inputBuffer + (i * cacheRunSize), cacheRunSize / rowSize, rowSize);
         verifySortedRuns(inputBuffer + (i * cacheRunSize), cacheRunSize / rowSize, rowSize);
     }
@@ -99,15 +99,15 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
         tol->pass();
     }
     outputRun->flush();
-    for (size_t i = 0; i < numberOfRecords; i++) {
-        uint8_t* ptr;
-        outputRun->getNext(&ptr);
-        cout << "[" << i + 1 << "]";
-        for (size_t j = 0; j < rowSize; j++) {
-            cout << (int) ptr[j] << " ";
-        }
-        cout << endl;
-    }
+    //for (size_t i = 0; i < numberOfRecords; i++) {
+    //    uint8_t* ptr;
+    //    outputRun->getNext(&ptr);
+    //    cout << "[" << i + 1 << "]";
+    //    for (size_t j = 0; j < rowSize; j++) {
+    //        cout << (int) ptr[j] << " ";
+    //    }
+    //    cout << endl;
+    //}
 
     // Free buffers
     dram.freeSpace(outputBuffer, outputBufferSize);
@@ -188,7 +188,6 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
         if (i == numberOfSsdRuns - 1) {
             minRunSize = ssdLastRunSize;
         }
-        // runs[i] = new Run(inputHdd, inputBuffer + (i * minRunSize), inputBlockSize, inputStartOffset + (i * minRunSize), 0, minRunSize, minRunSize, rowSize, minRunSize);
         runs[numberOfCacheRuns + i] = new Run(outputSsd, ssdInputBuffers[i], ssdBlockSize, i * minRunSize, minRunSize, minRunSize, ssdBlockSize, rowSize, 0);
     }
     Run* outputRun = new Run(outputDevice, outputBuffer, outputBlockSize, outputStartOffset, 0, bytesToFill, outputBufferSize, rowSize, 0);
@@ -312,8 +311,8 @@ int main(int argc, char* argv[]) {
     cout << "Size of one record: " << rowSize << endl;
     cout << "Output file name: " << o_filename << endl;
 
-    ScanIterator* const sc_it = new ScanIterator(new ScanPlan(totalDataSize, hddBlockSize));
-    sc_it->run();
+    //ScanIterator* const sc_it = new ScanIterator(new ScanPlan(totalDataSize, hddBlockSize));
+    //sc_it->run();
 
     /**
      * Case 1: < 100 MB
