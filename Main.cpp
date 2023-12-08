@@ -11,18 +11,18 @@
 #include <fstream>
 #include <math.h>
 #define cout outTrace
-#define KB (size_t) 1024
-#define MB 1024 * KB
-#define GB 1024 * MB
+#define KB (size_t) 1000
+#define MB 1000 * KB
+#define GB 1000 * MB
 #define FALSE 0
 #define TRUE 1
 
 using namespace std;
 std::ofstream  outTrace;
 
-const size_t ssdBlockSize = 10 ;//* KB;
-const size_t hddBlockSize = 10 ;//* MB;
-const size_t cacheLimit = 60;//1 * MB;
+const size_t ssdBlockSize = 10 * KB;
+const size_t hddBlockSize = 1 * MB;
+const size_t cacheLimit = 1 * MB;
 const size_t dramLimit = 100 * MB;
 const size_t ssdLimit = 10 * GB;
 const size_t hddLimit = 900 * GB;
@@ -30,9 +30,9 @@ const size_t ssdMaxRunCount = 100;
 const size_t hddMaxRunCount = 97;
 const size_t ssdMaxInputBufferSize = ssdMaxRunCount * ssdBlockSize;
 const size_t hddMaxInputBufferSize = hddMaxRunCount * hddBlockSize;
-const size_t cacheRunSize = cacheLimit - ssdBlockSize;   	
-size_t numberOfRecords = 20;    // Number of rows
-size_t rowSize = 10;             // Size of each row in bytes
+const size_t cacheRunSize = 500 * KB;  	
+size_t numberOfRecords = 1 * MB;    // Number of rows
+size_t rowSize = 50;             // Size of each row in bytes
 size_t totalDataSize = numberOfRecords * rowSize;
 Ssd* inputHdd;
 Ssd* outputSsd = new Ssd("./output/ssd.bin", ssdLimit, ssdBlockSize);
@@ -81,19 +81,27 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
     Run** runs = new Run*[numberOfRuns];
     for (size_t i = 0; i < numberOfRuns; i++) {
         size_t minRunSize = std::min(runSize, bytesToFill - (inputStartOffset + (i * runSize)));
-        runs[i] = new Run(inputHdd, inputBuffer, inputBlockSize, inputStartOffset + (i * runSize), 0, minRunSize, minRunSize, rowSize, minRunSize);
-        quickSort(runs[i]->getBuf(), minRunSize / rowSize, rowSize);
+        runs[i] = new Run(inputHdd, inputBuffer  + (i * minRunSize), inputBlockSize, inputStartOffset + (i * minRunSize), 0, minRunSize, minRunSize, rowSize, minRunSize);
+        quickSort(inputBuffer + (i * minRunSize), minRunSize / rowSize, rowSize);
     }
-    Run* outputRun = new Run(outputDevice, outputBuffer, outputBlockSize, outputStartOffset, 0, runSize, outputBufferSize, rowSize, 0);
+    Run* outputRun = new Run(outputDevice, outputBuffer + outputStartOffset, outputBlockSize, outputStartOffset, 0, bytesToFill, outputBufferSize, rowSize, 0);
+
     // Merge these runs using Tree-of-Losers and output to the given output storage device
     ETable* t = new ETable(numberOfRecords, rowSize, rowSize, 0);
     TOL* tol = new TOL(numberOfRuns, runs, outputRun, *t);
     for (size_t i = 0; i < numberOfRecords + 1; i++) {
-        tol->print();
-        cout << "-----------------------Pass " << i << " ----------------------------" << endl;
         tol->pass();
     }
     outputRun->flush();
+    for (int i = 0; i < numberOfRecords; i++) {
+		uint8_t *ptr;
+		outputRun->getNext(&ptr);
+		cout << "[" << i + 1 << "]";
+		for (int j = 0; j < rowSize; j++) {
+			cout << (int) ptr[j] << " ";
+		}
+		cout << endl;
+	}
 
     // Free buffers
     dram.freeSpace(outputBuffer, outputBufferSize);
