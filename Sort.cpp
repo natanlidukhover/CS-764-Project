@@ -114,5 +114,5 @@ void verifySortedRuns(uint8_t *data, int endRow, int rowSize) {
 			return;
 		}
 	}
-	cout << "Verification of data successfull!" << endl;
+	cout << "Verification of data successful!" << endl;
 }

@@ -57,19 +57,19 @@ int main1(int argc, char* argv[]) {
 	// 		cout << (int)data[i * row_size + j];
 	// 		cout << " ";
 	// 	}
-	// 	cout << "\n";
+	// 	cout << endl;
 	// }
-	// cout << "\n";
+	// cout << endl;
 
 	quickSort(data, number_of_records, row_size);
 	verifySortedRuns(data, number_of_records, row_size);
 
-	// cout << "Sorted table" << "\n";
+	// cout << "Sorted table" << endl;
 	// for (size_t i = 0; i < number_of_records; i++) {
 	// 	for (size_t j = 0; j < row_size; j++) {
 	// 		cout << (int)data[i * row_size + j] << " ";
 	// 	}
-	// 	cout << "\n";
+	// 	cout << endl;
 	// }
 
 	//for hdd blockSize is given by bandwidth * latency = 100*0.01

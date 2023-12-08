@@ -38,7 +38,7 @@ ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	    TRACE(true);
 
     this->file = "./input/testData.bin";
-    cout << "Random data will be written to the file ./data/testData.bin" << "\n";
+    cout << "Random data will be written to the file ./data/testData.bin" << endl;
 } // ScanIterator::ScanIterator
 
 ScanIterator::~ScanIterator ()
@@ -76,7 +76,7 @@ std::vector<int> ScanIterator::getParameters(int numberOfIntegers) {
         int random_number = dis(gen);
         intVector.push_back(random_number); // Appending a random number
     }
-    //cout << "Generated " << numberOfIntegers << " bytes of random data\n";
+    //cout << "Generated " << numberOfIntegers << " bytes of random data" << endl;
     return intVector;
 }
 
@@ -144,7 +144,7 @@ vector<int> ScanIterator::run ()
     //generate chunkSize bytes of random data at a time and write it to file
     size_t blockSize = this->blockSize;
     size_t blocks = countOfBytes/blockSize;
-    cout << "Number of chunks to write: " << blocks << "each having size" << blockSize << "\n";
+    cout << "Number of chunks to write: " << blocks << " each having size " << blockSize << endl;
     for(size_t i = 0; i < blocks; i++)
     {
         std::vector<int> currChunk = this->getParameters(blockSize);
@@ -152,7 +152,7 @@ vector<int> ScanIterator::run ()
         // Hence we pass a flag isAppendOnly whose vaue is i which will be false when it is the first run(i=0)
         this->saveIntegersToBinaryFile(currChunk, this->file, i);
         // if(i % (blocks/100) == 0 && i!=0){
-        //     cout << "Written" << i * blockSize <<"bytes to the file " << this->file << "\n";
+        //     cout << "Written" << i * blockSize <<"bytes to the file " << this->file << endl;
         // }    
     }
     size_t remaining = countOfBytes % blockSize;
