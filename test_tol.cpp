@@ -16,10 +16,10 @@ int mainsuck(int argc, char* argv[]) {
 	uint8_t *dataPtr;
 
 	// all constants
-	numRecords = 100;
-	rowSize = 5;
-	blockSize = rowSize;
-	dramRunSize = blockSize * 2;
+	numRecords = (size_t)1 * 1000 * 1000;
+	rowSize = 50;
+	blockSize = (size_t) 1 * 1000 * 1000;
+	dramRunSize = blockSize;
 	nor = (numRecords * rowSize)/dramRunSize;
 	hddRunSize = (numRecords * rowSize)/nor;
 
@@ -75,18 +75,18 @@ int mainsuck(int argc, char* argv[]) {
 	ETable t(numRecords, rowSize, rowSize, 0);
 	TOL tol(nor, runs, &outputRun, t);
 	for (int i = 0; i < numRecords + 1; i++) {
-		cout << "-----------------------Pass " << i << " ----------------------------" << endl;
-		tol.print();
+		//cout << "-----------------------Pass " << i << " ----------------------------" << endl;
+		//tol.print();
 		tol.pass();
 	}
 	outputRun.flush();
-	for (size_t i = 0; i < numRecords; i++) {
-		for (size_t j = 0; j < rowSize; j++) {
-			cout << (int)numbers[i * rowSize + j] << " ";
-		}
-		cout << endl;
-	}
-	cout << endl;
+	//for (size_t i = 0; i < numRecords; i++) {
+	//	for (size_t j = 0; j < rowSize; j++) {
+	//		cout << (int)numbers[i * rowSize + j] << " ";
+	//	}
+	//	cout << endl;
+	//}
+	//cout << endl;
 
 	for (int i = 0; i < numRecords; i++) {
 		uint8_t *ptr;
