@@ -33,7 +33,7 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
     }
 
 
-    // Iterate through unsorted data page by page
+    // Iterate through unsorted data page by page.
     size_t intsReadCount = 0;
     size_t rowReadCount = 0;
     size_t pageCount = 0;
