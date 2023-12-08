@@ -34,8 +34,9 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
 
 
     // Iterate through unsorted data page by page
-    size_t pageCount = 0;
+    size_t intsReadCount = 0;
     size_t rowReadCount = 0;
+    size_t pageCount = 0;
     while (unsortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
         std::vector<uint8_t> currentRow(buffer);
 
@@ -49,7 +50,8 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
 }
 
         rowReadCount++;
-        if (rowReadCount % pageSize == 0) {
+        intsReadCount+=rowSize;
+        if (intsReadCount % pageSize == 0) {
             pageCount++;
         }
 
