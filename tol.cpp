@@ -265,6 +265,7 @@ void TOL::calculateIWinner(Node &curr, Node &l, Node &r, size_t domain = 10, siz
 		curr.ovc = INV;
 		setWWinner(curr, r);
 		setWLoser(curr, l);
+		std::cout << "Found duplicate row: " << curr.index << ", " << curr.winnerIndex << std::endl; 
 		curr.nodeType = NT_INODE;
 		curr.winnerNT = NT_INODE;
 		return;

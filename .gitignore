@@ -2,6 +2,8 @@
 *.exe
 *.json
 input/
+input_copy/
 output/
+output_copy/
 *.txt
 *.swp

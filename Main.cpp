@@ -46,9 +46,9 @@ size_t numberOfRecords = 12 * MB;       // Number of rows
 size_t rowSize = 1 * KB;                // Size of each row in bytes
 size_t totalDataSize = numberOfRecords * rowSize;
 Ssd* inputHdd;
-Ssd* interimHdd = new Ssd("./output/hdd.bin", hddLimit, hddBlockSize);
-Ssd* outputSsd = new Ssd("./output/ssd.bin", ssdLimit, ssdBlockSize);
-Ssd* outputHdd = new Ssd("./output/testData.bin", hddLimit, hddBlockSize);
+Ssd* interimHdd;
+Ssd* outputSsd;
+Ssd* outputHdd ;
 
 /**
  * @param const size_t bytesToFill: how many bytes to read into DRAM from the input storage device
@@ -258,7 +258,7 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
     const size_t ssdRunSize = dramLimit - hddBlockSize;
     const size_t ssdActualDataSize = ssdMaxRunCount * ssdRunSize;
     const size_t minSsdDramInputBufferSize = dramLimit - outputBufferSize - ssdMaxInputBufferSize;
-    const size_t hddRunSize = ssdActualDataSize + minSsdDramInputBufferSize;
+    const size_t hddRunSize = ssdActualDataSize;
     const size_t minDramInputBufferSize = dramLimit - outputBufferSize - ssdMaxInputBufferSize - hddMaxInputBufferSize;
     const size_t hddMaxDataSize = bytesToFill - ssdActualDataSize - minDramInputBufferSize;
     const size_t dramInputBufferSize = minDramInputBufferSize;//dramLimit - outputBufferSize - ssdMaxInputBufferSize - (numberOfHddRuns * hddBlockSize);
@@ -411,12 +411,13 @@ int main(int argc, char* argv[]) {
     if (runVerification) {
         // Verification
         cout << "Running verification check" << endl;
-        verify("./output/hdd.bin", "./input/testData.bin", hddBlockSize, rowSize, numberOfRecords);
+        verify("./output/testData.bin", "./input/testData.bin", hddBlockSize, rowSize, numberOfRecords);
     } else {
     	inputHdd = new Ssd("./input/testData.bin", totalDataSize, hddBlockSize);
-		outputHdd = new Ssd("./output/hdd.bin", hddLimit, hddBlockSize);
+		interimHdd = new Ssd("./output/hdd.bin", totalDataSize, hddBlockSize);
+    	outputSsd = new Ssd("./output/ssd.bin", ssdLimit, ssdBlockSize);
+        outputHdd = new Ssd("./output/testData.bin", totalDataSize, hddBlockSize);
         totalDataSize = numberOfRecords * rowSize;  // Total amount of data in bytes
-        inputHdd = new Ssd("./input/testData.bin", totalDataSize, hddBlockSize);
 
         // Print the values
         cout << "Total number of records: " << numberOfRecords << endl;
