@@ -263,8 +263,8 @@ void TOL::calculateIWinner(Node &curr, Node &l, Node &r, size_t domain = 10, siz
 	}
 	if (i == t._rowSize) {
 		curr.ovc = INV;
-		setWinner(curr, r);
-		setLoser(curr, l);
+		setWWinner(curr, r);
+		setWLoser(curr, l);
 		curr.nodeType = NT_INODE;
 		curr.winnerNT = NT_INODE;
 		return;
@@ -458,6 +458,9 @@ int TOL::pass() {
 	if (nodeList[0].winnerNT == NT_INF) {
 		return EINF;
 	}
+	if (nodeList[0].winnerKey == NULL) {
+		cout << "Winner node type: " << nodeList[0].winnerNT << " and key: " << nodeList[0].winnerKey << endl;
+	}
 	// Store current winner
 	int ret = output->setNext(nodeList[0].winnerKey);
 	if (ret != SUCCESS) {
@@ -520,7 +523,7 @@ void TOL::print() {
 }
 
 TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor),t(_t) {
-	if (nor > 256) {
+	if (nor > 512) {
 		throw std::runtime_error("TOL doesn't fit in cache");
 	}
 	t._NumRows = _t._NumRows;

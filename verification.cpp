@@ -5,12 +5,12 @@
 #include <fstream>
 #include <set>
 #define cout outTrace
-void verify(char *sortedFilePath, char *unsortedFilePath, size_t pageSize, size_t rowSize, size_t totalUnsortedRows) {
-	FILE *sortedFile = fopen(sortedFilePath, "r+");
-	FILE *unsortedFile = fopen(unsortedFilePath, "r+");
+void verify(const std::string &sortedFilePath, const std::string &unsortedFilePath, size_t pageSize, size_t rowSize, size_t totalUnsortedRows) {
+    std::ifstream sortedFile(sortedFilePath, std::ios::binary);
+    std::ifstream unsortedFile(unsortedFilePath, std::ios::binary);
 
     if (!sortedFile || !unsortedFile) {
-        cout << "Error opening files." << std::endl;
+        std::cerr << "Error opening files." << std::endl;
         return;
     }
     
@@ -19,18 +19,37 @@ void verify(char *sortedFilePath, char *unsortedFilePath, size_t pageSize, size_
 
     // Read and verify sorted data
     std::vector<uint8_t> previousRow;
-    //while (sortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
-    while (fread(buffer.data(), 1, rowSize, sortedFile)) {
+    int row_index = 0;
+    while (sortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
         std::vector<uint8_t> currentRow(buffer);
         
         if (!previousRow.empty() && currentRow < previousRow) {
-            cout << "Sorted data is not sorted correctly." << std::endl;
+            std::cerr << "Sorted data is not sorted correctly." << std::endl;
+            std::cerr << row_index << ":" << std::endl;
+            for (int i = 0; i < rowSize; i++) {
+                std::cerr << (int)currentRow[i] << " ";
+            }
+            std::cerr << std::endl;
+            for (int i = 0; i < rowSize; i++) {
+                std::cerr << (int)previousRow[i] << " ";
+            }
+            // std::cerr << std::endl;
+            // sortedFile.seekg((size_t) 1000 * rowSize, ios_base::cur);
+            // while (sortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
+            //     std::vector<uint8_t> currentRow(buffer);
+            //     for (int i = 0; i < 5; i++) {
+            //         std::cerr << (int)currentRow[i] << " ";
+            //     }
+            //     std::cerr << std::endl;
+            //     sortedFile.seekg((size_t) 1000 * rowSize, ios_base::cur);
+            // }
+
             return;
         }
 
         sortedDataSet.insert(currentRow);
         previousRow = std::move(currentRow);
-
+        row_index++;
     }
 
 
@@ -38,16 +57,16 @@ void verify(char *sortedFilePath, char *unsortedFilePath, size_t pageSize, size_
     size_t intsReadCount = 0;
     size_t rowReadCount = 0;
     size_t pageCount = 0;
-    while (fread(buffer.data(), 1, rowSize, unsortedFile)) {
+    while (unsortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
         std::vector<uint8_t> currentRow(buffer);
 
 		if (sortedDataSet.find(currentRow) == sortedDataSet.end()) {
-    		cout << "Row not found in sorted data: ";
+    		std::cerr << "Row not found in sorted data: ";
     		for (auto val : currentRow) {
         		std::cerr << static_cast<int>(val) << " ";
     		}
     		std::cerr << std::endl;
-    		return;
+    		//return;
 }
 
         rowReadCount++;
