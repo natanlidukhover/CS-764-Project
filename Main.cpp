@@ -23,6 +23,13 @@
 
 using namespace std;
 std::ofstream outTrace;
+std::ofstream dramDebugOut;
+std::ofstream ssdDebugOut;
+std::ofstream hddDebugOut;
+std::ofstream finalDebugOut;
+
+int debug = 0;
+int ssdDebug = 0;
 
 const size_t ssdBlockSize = 10 * KB;
 const size_t hddBlockSize = 1 * MB;
@@ -65,7 +72,7 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
     const size_t numberOfCacheRuns = (bytesToFill / cacheRunSize) + (bytesToFill % cacheRunSize != 0);  // Round up
     const size_t outputBufferSize = outputBlockSize;
     const size_t inputBufferSize = dramLimit - outputBufferSize;
-    const size_t cacheLastRunSize = inputBufferSize - ((numberOfCacheRuns - 1) * cacheRunSize);
+    const size_t cacheLastRunSize = (inputBufferSize % cacheRunSize == 0) ? cacheRunSize : (inputBufferSize % cacheRunSize);
 
     // Create buffers
     uint8_t* inputBuffer = (uint8_t*) dram.getSpace(inputBufferSize);
@@ -97,7 +104,8 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
     // Merge these runs using Tree-of-Losers and output to the given output storage device
     ETable* t = new ETable(numberOfRecords, rowSize, rowSize, 0);
     TOL* tol = new TOL(numberOfCacheRuns, runs, outputRun, *t);
-    for (size_t i = 0; i < numberOfRecords + 1; i++) {
+    size_t numberOfTolRecords = bytesToFill / rowSize;
+    for (size_t i = 0; i < numberOfTolRecords + 1; i++) {
         tol->pass();
     }
     outputRun->flush();
@@ -110,6 +118,17 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
     //    }
     //    cout << endl;
     //}
+    if (debug && ssdDebug) {
+        for (size_t i = 0; i < numberOfTolRecords; i++) {
+            uint8_t* ptr;
+            outputRun->getNext(&ptr);
+            ssdDebugOut << "[" << i + 1 << "]";
+            for (size_t j = 0; j < 5; j++) {
+                ssdDebugOut << (int) ptr[j] << " ";
+            }
+            ssdDebugOut << endl;
+        }
+    }
 
     // Free buffers
     dram.freeSpace(outputBuffer, outputBufferSize);
@@ -145,8 +164,8 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
     const size_t dramInputBufferSize = minDramInputBufferSize;//dramLimit - outputBufferSize - (numberOfSsdRuns * ssdBlockSize);
     const size_t ssdActualDataSize = bytesToFill - dramInputBufferSize;
     const size_t numberOfCacheRuns = (dramInputBufferSize / cacheRunSize) + (dramInputBufferSize % cacheRunSize != 0);  // Round up
-    const size_t cacheLastRunSize = dramInputBufferSize - ((numberOfCacheRuns - 1) * cacheRunSize);
-    const size_t ssdLastRunSize = ssdActualDataSize - ((numberOfSsdRuns - 1) * ssdRunSize);
+    const size_t cacheLastRunSize = (dramInputBufferSize % cacheRunSize == 0) ? cacheRunSize : (dramInputBufferSize % cacheRunSize);
+    const size_t ssdLastRunSize = (ssdActualDataSize % ssdRunSize == 0) ? ssdRunSize : (ssdActualDataSize % ssdRunSize);
 
     // Perform input-to-SSD sort and merge through DRAM
     size_t inputOffset = inputStartOffset;
@@ -196,19 +215,24 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
     // Merge these runs with the SSD input buffers using Tree-of-Losers and output to HDD using outputBuffer
     ETable* t = new ETable(numberOfRecords, rowSize, rowSize, 0);
     TOL* tol = new TOL(numberOfCacheRuns + numberOfSsdRuns, runs, outputRun, *t);
-    for (size_t i = 0; i < numberOfRecords + 1; i++) {
+    const size_t numberOfCacheRecords = dramInputBufferSize / rowSize;
+    const size_t numberOfSsdRecords = ssdActualDataSize / rowSize;
+    const size_t numberOfTolRecords = numberOfCacheRecords + numberOfSsdRecords;
+    for (size_t i = 0; i < numberOfTolRecords + 1; i++) {
         tol->pass();
     }
     outputRun->flush();
-    //for (size_t i = 0; i < numberOfRecords; i++) {
-    //    uint8_t* ptr;
-    //    outputRun->getNext(&ptr);
-    //    cout << "[" << i + 1 << "]";
-    //    for (size_t j = 0; j < rowSize; j++) {
-    //        cout << (int) ptr[j] << " ";
-    //    }
-    //    cout << endl;
-    //}
+    if (debug) {
+        for (size_t i = 0; i < numberOfTolRecords; i++) {
+            uint8_t* ptr;
+            outputRun->getNext(&ptr);
+            hddDebugOut << "[" << i + 1 << "]";
+            for (size_t j = 0; j < 5; j++) {
+                hddDebugOut << (int) ptr[j] << " ";
+            }
+            hddDebugOut << endl;
+        }
+    }
 
     // Free buffers
     dram.freeSpace(outputBuffer, outputBufferSize);
@@ -241,11 +265,12 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
     const size_t hddActualDataSize = bytesToFill - ssdActualDataSize - dramInputBufferSize;
     const size_t numberOfHddRuns = (hddActualDataSize / hddRunSize) + (hddActualDataSize % hddRunSize != 0);  // Round up
     const size_t numberOfCacheRuns = (dramInputBufferSize / cacheRunSize) + (dramInputBufferSize % cacheRunSize != 0);  // Round up
-    const size_t cacheLastRunSize = dramInputBufferSize - ((numberOfCacheRuns - 1) * cacheRunSize);
-    const size_t ssdLastRunSize = ssdActualDataSize - ((ssdMaxRunCount - 1) * ssdRunSize);
-    const size_t hddLastRunSize = hddActualDataSize - ((numberOfHddRuns - 1) * hddRunSize);
+    const size_t cacheLastRunSize = (dramInputBufferSize % cacheRunSize == 0) ? cacheRunSize : (dramInputBufferSize % cacheRunSize);
+    const size_t ssdLastRunSize = (ssdActualDataSize % ssdRunSize == 0) ? ssdRunSize : (ssdActualDataSize % ssdRunSize);
+    const size_t hddLastRunSize = (hddActualDataSize % hddRunSize == 0) ? hddRunSize : (hddActualDataSize % hddRunSize);
 
     // Perform input-to-SSD-to-HDD sort
+    //size_t inputOffset = hddActualDataSize + ssdActualDataSize;
     size_t inputOffset = inputStartOffset;
     size_t hddBytesLeft = hddActualDataSize;
     while (hddBytesLeft > 0) {
@@ -254,6 +279,7 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         hddBytesLeft -= minRunSize;
     }
 
+    ssdDebug = 1;
     // Perform input-to-SSD sort
     size_t ssdBytesLeft = ssdActualDataSize;
     while (ssdBytesLeft > 0) {
@@ -261,6 +287,7 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         inputOffset = sortDramAndStore(minRunSize, inputOffset, ssdActualDataSize - ssdBytesLeft, TRUE, outputSsd);
         ssdBytesLeft -= minRunSize;
     }
+    ssdDebug = 0;
 
     // Create buffers
     uint8_t* dramInputBuffer = (uint8_t*) dram.getSpace(dramInputBufferSize);
@@ -293,6 +320,17 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         runs[i] = new Run(inputHdd, dramInputBuffer + (i * cacheRunSize), inputBlockSize, 0, 0, cacheRunSize, cacheRunSize, rowSize, cacheRunSize);
         quickSort(dramInputBuffer + (i * cacheRunSize), cacheRunSize / rowSize, rowSize);
     }
+    if (debug) {
+        for (size_t i = 0; i < dramInputBufferSize / rowSize; i++) {
+            uint8_t* ptr;
+            ptr = dramInputBuffer + (i * rowSize);
+            dramDebugOut << "[" << i + 1 << "]";
+            for (size_t j = 0; j < 5; j++) {
+                dramDebugOut << (int) ptr[j] << " ";
+            }
+            dramDebugOut << endl;
+        }
+    }
     for (size_t i = 0; i < ssdMaxRunCount; i++) {
         size_t minRunSize = ssdRunSize;
         if (i == ssdMaxRunCount - 1) {
@@ -316,14 +354,16 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         tol->pass();
     }
     outputRun->flush();
-    for (size_t i = 0; i < numberOfRecords; i+= 1) {
-       uint8_t* ptr;
-       outputRun->getNext(&ptr);
-       cout << "[" << i + 1 << "]";
-       for (size_t j = 0; j < 5; j++) {
-           cout << (int) ptr[j] << " ";
-       }
-       cout << endl;
+    if (debug) {
+        for (size_t i = 0; i < numberOfRecords; i++) {
+            uint8_t* ptr;
+            outputRun->getNext(&ptr);
+            finalDebugOut << "[" << i + 1 << "]";
+            for (size_t j = 0; j < 5; j++) {
+                finalDebugOut << (int) ptr[j] << " ";
+            }
+            finalDebugOut << endl;
+        }
     }
 
     // Free buffers
@@ -356,7 +396,16 @@ int main(int argc, char* argv[]) {
             outputFilename = argv[i + 1];
         } else if (strcmp(argv[i], "-v") == 0) {
             runVerification = 1;
+        } else if (strcmp(argv[i], "-d") == 0) {
+            debug = 1;
         }
+    }
+
+    if (debug) {
+        dramDebugOut.open("./output/dram.txt", std::ios_base::out);
+        ssdDebugOut.open("./output/ssd.txt", std::ios_base::out);
+        hddDebugOut.open("./output/hdd.txt", std::ios_base::out);
+        finalDebugOut.open("./output/testData.txt", std::ios_base::out);
     }
 
     if (runVerification) {

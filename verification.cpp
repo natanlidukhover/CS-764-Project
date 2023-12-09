@@ -5,7 +5,7 @@
 #include <fstream>
 #include <set>
 #define cout outTrace
-void verify(const std::string &sortedFilePath, const std::string &unsortedFilePath, size_t pageSize, size_t rowSize, size_t totalUnsortedRows) {
+void verify(char* sortedFilePath, char* unsortedFilePath, size_t pageSize, size_t rowSize, size_t totalUnsortedRows) {
     std::ifstream sortedFile(sortedFilePath, std::ios::binary);
     std::ifstream unsortedFile(unsortedFilePath, std::ios::binary);
 
@@ -26,11 +26,11 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
         if (!previousRow.empty() && currentRow < previousRow) {
             std::cerr << "Sorted data is not sorted correctly." << std::endl;
             std::cerr << row_index << ":" << std::endl;
-            for (int i = 0; i < rowSize; i++) {
+            for (size_t i = 0; i < rowSize; i++) {
                 std::cerr << (int)currentRow[i] << " ";
             }
             std::cerr << std::endl;
-            for (int i = 0; i < rowSize; i++) {
+            for (size_t i = 0; i < rowSize; i++) {
                 std::cerr << (int)previousRow[i] << " ";
             }
             // std::cerr << std::endl;
