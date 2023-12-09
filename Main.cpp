@@ -41,7 +41,7 @@ size_t totalDataSize = numberOfRecords * rowSize;
 Ssd* inputHdd;
 Ssd* interimHdd = new Ssd("./output/hdd.bin", hddLimit, hddBlockSize);
 Ssd* outputSsd = new Ssd("./output/ssd.bin", ssdLimit, ssdBlockSize);
-Ssd* outputHdd = new Ssd("./output/hdd.bin", hddLimit, hddBlockSize);
+Ssd* outputHdd = new Ssd("./output/testData.bin", hddLimit, hddBlockSize);
 
 /**
  * @param const size_t bytesToFill: how many bytes to read into DRAM from the input storage device
