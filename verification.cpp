@@ -5,12 +5,12 @@
 #include <fstream>
 #include <set>
 #define cout outTrace
-void verify(const std::string &sortedFilePath, const std::string &unsortedFilePath, size_t pageSize, size_t rowSize, size_t totalUnsortedRows) {
-    std::ifstream sortedFile(sortedFilePath, std::ios::binary);
-    std::ifstream unsortedFile(unsortedFilePath, std::ios::binary);
+void verify(char *sortedFilePath, char *unsortedFilePath, size_t pageSize, size_t rowSize, size_t totalUnsortedRows) {
+	FILE *sortedFile = fopen(sortedFilePath, "r+");
+	FILE *unsortedFile = fopen(unsortedFilePath, "r+");
 
     if (!sortedFile || !unsortedFile) {
-        std::cerr << "Error opening files." << std::endl;
+        cout << "Error opening files." << std::endl;
         return;
     }
     
@@ -19,11 +19,12 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
 
     // Read and verify sorted data
     std::vector<uint8_t> previousRow;
-    while (sortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
+    //while (sortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
+    while (fread(buffer.data(), 1, rowSize, sortedFile)) {
         std::vector<uint8_t> currentRow(buffer);
         
         if (!previousRow.empty() && currentRow < previousRow) {
-            std::cerr << "Sorted data is not sorted correctly." << std::endl;
+            cout << "Sorted data is not sorted correctly." << std::endl;
             return;
         }
 
@@ -37,11 +38,11 @@ void verify(const std::string &sortedFilePath, const std::string &unsortedFilePa
     size_t intsReadCount = 0;
     size_t rowReadCount = 0;
     size_t pageCount = 0;
-    while (unsortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
+    while (fread(buffer.data(), 1, rowSize, unsortedFile)) {
         std::vector<uint8_t> currentRow(buffer);
 
 		if (sortedDataSet.find(currentRow) == sortedDataSet.end()) {
-    		std::cerr << "Row not found in sorted data: ";
+    		cout << "Row not found in sorted data: ";
     		for (auto val : currentRow) {
         		std::cerr << static_cast<int>(val) << " ";
     		}

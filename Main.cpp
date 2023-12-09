@@ -40,7 +40,7 @@ size_t rowSize = 50;                // Size of each row in bytes
 size_t totalDataSize = numberOfRecords * rowSize;
 Ssd* inputHdd;
 Ssd* outputSsd = new Ssd("./output/ssd.bin", ssdLimit, ssdBlockSize);
-Ssd* outputHdd = new Ssd("./output/hdd.bin", hddLimit, hddBlockSize);
+Ssd* outputHdd;
 
 /**
  * @param const size_t bytesToFill: how many bytes to read into DRAM from the input storage device
@@ -290,7 +290,6 @@ int main(int argc, char* argv[]) {
     // Default values
     std::string outputFilename = "o.txt";  // Output file name
     int runVerification = 0;
-    inputHdd = new Ssd("./input/testData.bin", totalDataSize, hddBlockSize);
     outTrace.open(outputFilename, std::ios_base::out);
     TRACE(true);
 
@@ -312,6 +311,8 @@ int main(int argc, char* argv[]) {
         cout << "Running verification check" << endl;
         verify("./output/hdd.bin", "./input/testData.bin", hddBlockSize, rowSize, numberOfRecords);
     } else {
+    	inputHdd = new Ssd("./input/testData.bin", totalDataSize, hddBlockSize);
+		outputHdd = new Ssd("./output/hdd.bin", hddLimit, hddBlockSize);
         totalDataSize = numberOfRecords * rowSize;  // Total amount of data in bytes
 
         // Print the values
