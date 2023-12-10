@@ -265,7 +265,7 @@ void TOL::calculateIWinner(Node &curr, Node &l, Node &r, size_t domain = 10, siz
 		curr.ovc = INV;
 		setWWinner(curr, r);
 		setWLoser(curr, l);
-		std::cout << "Found duplicate row: " << curr.index << ", " << curr.winnerIndex << std::endl; 
+		std::cout << "Found duplicate row: " << curr.index << ", " << curr.winnerIndex << std::endl;
 		curr.nodeType = NT_INODE;
 		curr.winnerNT = NT_INODE;
 		return;
@@ -539,6 +539,9 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 	// init leaf nodes
 	size_t firstLeaf = pow(2, tol_height - 1) - 1;
 	size_t lastLeaf = pow(2, tol_height) - 2;
+	std::cout << "First leaf index: " << firstLeaf << std::endl;
+	std::cout << "Last leaf index: " << lastLeaf << std::endl;
+	std::cout << "Number of runs: " << nor << std::endl;
 	for (size_t i = 0; i <= (lastLeaf - firstLeaf); i++) {
 		int li = firstLeaf + i;
 		nodeList[li].index = li;
@@ -556,6 +559,9 @@ TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOf
 		} else {
 			nodeList[li].nodeType = NT_LEAF;
 			runList[i]->getNext(&(nodeList[li].key));
+			if (runList[i]->source->srcSeek != 0) {
+				std::cout << "Run: " << i << " at leafIndex: " << li << " has seek: " << runList[i]->source->srcSeek << std::endl;
+			}
 			nodeList[li].r = runList[i];
 			nodeList[li].ovc = INV;
 

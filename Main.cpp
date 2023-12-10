@@ -42,7 +42,7 @@ const size_t hddMaxRunCount = 97;
 const size_t ssdMaxInputBufferSize = ssdMaxRunCount * ssdBlockSize;
 const size_t hddMaxInputBufferSize = hddMaxRunCount * hddBlockSize;
 const size_t cacheRunSize = 500 * KB;
-size_t numberOfRecords = 12 * MB;       // Number of rows
+size_t numberOfRecords = 22 * MB;       // Number of rows
 size_t rowSize = 1 * KB;                // Size of each row in bytes
 size_t totalDataSize = numberOfRecords * rowSize;
 Ssd* inputHdd;
@@ -81,7 +81,7 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
     // Read into DRAM input buffer from the given input storage device starting at inputStartOffset
     size_t inputOffset = inputStartOffset;
     size_t bytesRead = 0;
-    while (inputOffset < inputStartOffset + bytesToFill) {
+    while (inputOffset < (inputStartOffset + bytesToFill)) {
         if (inputHdd->readData(inputBuffer + bytesRead, inputOffset) <= 0) {
             break;
         }
@@ -186,7 +186,7 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
 
     // Read input into DRAM-to-HDD input buffer
     size_t bytesRead = 0;
-    while (inputOffset < bytesToFill) {
+    while (inputOffset < (inputStartOffset + bytesToFill)) {
         if (inputHdd->readData(dramInputBuffer + bytesRead, inputOffset) <= 0) {
             break;
         }
