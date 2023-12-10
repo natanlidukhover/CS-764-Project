@@ -30,7 +30,7 @@ Project Group 15 on Canvas. Following are the names along with the ID numbers
 - Natan Lidukhover - 907 934 3324
 - Shivam Hire - 908 272 5129
 - Smit Shah - 908 587 6440
-- Tyler Wilson -
+- Tyler Wilson - 908 622 6520
 
 ## Techniques Implemented:
 
