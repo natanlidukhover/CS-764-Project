@@ -72,14 +72,14 @@ class ETable {
     friend class TOL;
 
 public:
-    ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey);
-    ETable(const ETable& _t);
+    ETable(size_t numRows, size_t numCols, size_t recordSize, size_t sortKey);
+    ETable(const ETable& table);
     ~ETable();
-    size_t _NumRows;
-    size_t _NumCols;
-    size_t _RecordSize;
-    size_t _rowSize;
-    size_t  _SortKey;
+    size_t numRows;
+    size_t numCols;
+    size_t recordSize;
+    size_t rowSize;
+    size_t sortKey;
 };
 
 class TOL {

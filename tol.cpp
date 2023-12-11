@@ -10,8 +10,6 @@
 #include "Ssd.h"
 #include "defs.h"
 
-// TODO change these APIs to read and write any number of data
-
 // use to manage run "queue" in storate
 // getNext -> read block from head of run in SSD/HDD to DRAM
 // setNext -> write block from DRAM to tail of SSD/HDD
@@ -24,8 +22,8 @@
 // ss -> seek in SSD/HDD where run is stored
 // t -> tail offset, used if SSD/HDD already has data
 // ms -> maximum number of bytes which can be fitted in run on SSD/HDD
-Storage::Storage(Ssd* storage, uint8_t* _d, size_t bs, size_t ss, size_t t,
-                 size_t ms) : blockSize(bs), srcSeek(ss), d(_d), s(storage), tail(t), maxSize(ms) {
+Storage::Storage(Ssd* storage, uint8_t* _d, size_t bs, size_t ss, size_t t, size_t ms)
+    : blockSize(bs), srcSeek(ss), d(_d), s(storage), tail(t), maxSize(ms) {
     head = 0;
 }
 
@@ -39,8 +37,8 @@ Storage::~Storage() {
 // t -> tail offset, used if SSD/HDD already has data
 // ms -> maximum number of bytes which can be fitted in run on SSD/HDD
 // brs -> dram buffer size for this run
-Run::Run(Ssd* _s, uint8_t* _d, size_t bs, size_t ss, size_t t, size_t ms,
-         size_t rbs, size_t rowsze, size_t dramTail) : runBufferSize(rbs), rowSize(rowsze), tail(dramTail) {
+Run::Run(Ssd* _s, uint8_t* _d, size_t bs, size_t ss, size_t t, size_t ms, size_t rbs, size_t rowsze, size_t dramTail)
+    : runBufferSize(rbs), rowSize(rowsze), tail(dramTail) {
     head = 0;
     source = new Storage(_s, _d, bs, ss, t, ms);
 }
@@ -136,15 +134,16 @@ size_t Run::getBufferSize() {
     return runBufferSize;
 }
 
-ETable::ETable(size_t NumRows, size_t NumCols, size_t RecordSize, size_t SortKey = 0) : _NumRows(NumRows), _NumCols(NumCols), _RecordSize(RecordSize), _rowSize(RecordSize), _SortKey(SortKey) {
+ETable::ETable(size_t numRows, size_t numCols, size_t recordSize, size_t sortKey = 0)
+    : numRows(numRows), numCols(numCols), recordSize(recordSize), rowSize(recordSize), sortKey(sortKey) {
 }
 
-ETable::ETable(const ETable& _t) {
-    _NumRows = _t._NumRows;
-    _NumCols = _t._NumCols;
-    _RecordSize = _t._RecordSize;
-    _rowSize = _t._rowSize;
-    _SortKey = _t._SortKey;
+ETable::ETable(const ETable& table) {
+    numRows = table.numRows;
+    numCols = table.numCols;
+    recordSize = table.recordSize;
+    rowSize = table.rowSize;
+    sortKey = table.sortKey;
 }
 
 ETable::~ETable() {
@@ -208,7 +207,7 @@ void TOL::clearWinner(Node& n) {
  */
 void TOL::calculateIWinner(Node& curr, Node& l, Node& r, size_t domain = 10, size_t arity = 0, bool isAscending = true) {
     if (arity == 0)
-        arity = t._rowSize;
+        arity = t.rowSize;
     if (l.winnerOVC != INV && r.winnerOVC != INV) {
         if (l.winnerOVC != r.winnerOVC) {
             if (l.winnerOVC < r.winnerOVC) {
@@ -223,12 +222,12 @@ void TOL::calculateIWinner(Node& curr, Node& l, Node& r, size_t domain = 10, siz
         }
     }
     // If OVC comparison fail, compare whole row
-    unsigned short offset = t._rowSize;
+    unsigned short offset = t.rowSize;
     unsigned short value = domain;
     uint8_t* prevRow = l.winnerKey;
     uint8_t* currentRow = r.winnerKey;
     size_t i;
-    for (i = 0; i < t._rowSize; i++) {
+    for (i = 0; i < t.rowSize; i++) {
         if (currentRow[i] != prevRow[i]) {
             offset = i;
             if (currentRow[i] < prevRow[i]) {
@@ -245,7 +244,7 @@ void TOL::calculateIWinner(Node& curr, Node& l, Node& r, size_t domain = 10, siz
             break;
         }
     }
-    if (i == t._rowSize) {
+    if (i == t.rowSize) {
         curr.ovc = INV;
         setWWinner(curr, r);
         setWLoser(curr, l);
@@ -274,7 +273,7 @@ void TOL::calculateIWinner(Node& curr, Node& l, Node& r, size_t domain = 10, siz
  */
 void TOL::calculateLeafWinner(Node& curr, Node& l, Node& r, size_t domain = 10, size_t arity = 0, bool isAscending = true) {
     if (arity == 0)
-        arity = t._rowSize;
+        arity = t.rowSize;
     if (l.ovc != INV && r.ovc != INV) {
         if (l.ovc != r.ovc) {
             if (l.ovc < r.ovc) {
@@ -289,12 +288,12 @@ void TOL::calculateLeafWinner(Node& curr, Node& l, Node& r, size_t domain = 10, 
         }
     }
     // If OVC comparison fail, compare whole row
-    unsigned short offset = t._rowSize;
+    unsigned short offset = t.rowSize;
     unsigned short value = domain;
     uint8_t* prevRow = l.key;
     uint8_t* currentRow = r.key;
     size_t i;
-    for (i = 0; i < t._rowSize; i++) {
+    for (i = 0; i < t.rowSize; i++) {
         if (currentRow[i] != prevRow[i]) {
             offset = i;
             if (currentRow[i] < prevRow[i]) {
@@ -311,7 +310,7 @@ void TOL::calculateLeafWinner(Node& curr, Node& l, Node& r, size_t domain = 10, 
             break;
         }
     }
-    if (i == t._rowSize) {
+    if (i == t.rowSize) {
         curr.ovc = INV;
         setWinner(curr, r);
         setLoser(curr, l);
@@ -475,7 +474,7 @@ void TOL::print() {
             std::cout << "nodeType: " << nodeList[j].nodeType << endl;
             std::cout << "key: " << endl;
             if (nodeList[j].nodeType == NT_INODE || nodeList[j].nodeType == NT_LEAF) {
-                for (size_t k = 0; k < this->t._RecordSize; k++) {
+                for (size_t k = 0; k < this->t.recordSize; k++) {
                     std::cout << (int) nodeList[j].key[k] << " ";
                 }
                 std::cout << endl;
@@ -487,7 +486,7 @@ void TOL::print() {
             std::cout << "winnerNT: " << nodeList[j].winnerNT << endl;
             std::cout << "winnerKey: " << endl;
             if (nodeList[j].winnerNT == NT_INODE || nodeList[j].winnerNT == NT_LEAF) {
-                for (size_t k = 0; k < this->t._RecordSize; k++) {
+                for (size_t k = 0; k < this->t.recordSize; k++) {
                     std::cout << (int) nodeList[j].winnerKey[k] << " ";
                 }
                 std::cout << endl;
@@ -499,16 +498,17 @@ void TOL::print() {
     }
 }
 
-TOL::TOL(size_t nor, Run** rl, Run* o, ETable _t) : runList(rl), output(o), numOfRun(nor), t(_t) {
+TOL::TOL(size_t nor, Run** rl, Run* o, ETable _t)
+    : runList(rl), output(o), numOfRun(nor), t(_t) {
     TRACE(true);
     if (nor > 512) {
         throw std::runtime_error("TOL doesn't fit in cache");
     }
-    t._NumRows = _t._NumRows;
-    t._NumCols = _t._NumCols;
-    t._RecordSize = _t._RecordSize;
-    t._SortKey = _t._SortKey;
-    t._rowSize = _t._rowSize;
+    t.numRows = _t.numRows;
+    t.numCols = _t.numCols;
+    t.recordSize = _t.recordSize;
+    t.sortKey = _t.sortKey;
+    t.rowSize = _t.rowSize;
     int tol_height = ceil(log2(nor)) + 1;
     numNodes = pow(2, tol_height) - 1;
     nodeList = new Node[numNodes];
