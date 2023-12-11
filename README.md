@@ -63,6 +63,35 @@ Project Group 15 on Canvas. Following are the names along with the ID numbers
 - **Optimized merge patterns**([Main.cpp::sortHddandStore](https://github.com/natanlidukhover/CS764-Project/blob/8870c03b8b417f5c89c76e2422b1c3402fd1def7/Main.cpp#L262)):
   Implemented to make efficient use of all storage devices by pre-calculating the exact amount of DRAM needed plus the number of SSD and HDD runs that will be needed, and using DRAM->SSD->HDD as necessary. All the math calculating run sizes and buffer sizes implements the optimized merge patterns with three cases where either only DRAM, DRAM+SSD, or DRAM+SSD+HDD are needed.
 
+## Usage and discussion
+### Reasoning for techniques used
+We used the offset-value coding and tree of losers technique in order to provide good efficiency and a minimal comparison count. The tree of losers uses an array-based structure and all node accesses are done by indexing and calculating indexes rather than traversing a linked list. We split up the main loop into three cases: DRAM sort only, DRAM + SSD sort, and DRAM + SSD + HDD sort in order to provide readable code while re-using code components for similar merging and sorting steps.
+
+In the DRAM case, first the necessary output buffer size is set, and the remaining space (1-MB aligned) is used for the input buffer in order to maximize the amount that DRAM is used for quick access. Input is read in to DRAM from the specified input device. Cache-sized mini runs of 500KB are generated within DRAM and sorted using QuickSort due to its average case O(n * log(n)) time complexity and efficient O(log(n)) space complexity. These runs are then merged using tree of losers and output to the specified input device (case 1 is HDD).
+
+In the SSD case, first the necessary output buffer size is set, and the remaining space (1-MB aligned) is pre-calculated for the input buffer to use in the next step. The number of 99MB (dramLimit - 1MB)-size runs is calculated, and the size of the last run (if it is less than the normal run size) is calculated. The above DRAM case is then run that many times but output to SSD instead of HDD. Then, the input buffer in DRAM that was previously pre-calculated is filled from the input device. Cache-sized mini runs of 500KB are generated within DRAM and sorted using QuickSort. These runs are then merged with the runs persisted on the SSD using tree of losers.
+
+In the HDD case, first the necessary output buffer size is set, and the remaining space (1-MB aligned) is pre-calculated for the input buffer to use in the next step. The number of 9.9GB (ssdLimit)-size runs is calculated, and the size of the last run (if it is less than the normal run size) is calculated. The above SSD case is then run that many times but output to HDD. The above DRAM case is then run a maximal 100 times but output to SSD instead of HDD. Then, the input buffer in DRAM that was previously pre-calculated is filled from the input device. Cache-sized mini runs of 500KB are generated within DRAM and sorted using QuickSort. These runs are then merged with the runs persisted on the SSD and runs persisted on HDD using tree of losers. This all ensures that DRAM is used maximally before using SSD, then ensures that SSD is used maximally before using HDD.
+### Project state
+The project is complete, including a bonus credit for implementing optimized merge patterns. There are no bugs that we have seen in the final product. The program does not take into account a specific number of columns (each row is considered one column). This is not really a limitation as the sorting process is the exact same, and the debug prints the same way, so this has no difference in the final output.
+### Running the program
+The program can be run as follows (from the project base directory):
+```bash
+./Sort.exe -c [total number of records] -s [individual record size] -o [trace file]
+```
+
+To run the verification code rather than the sort process path, run it as follows. The sort process path must be run first in order to have data to verify at the necessary files (and the parameters must be identical):
+```bash
+./Sort.exe -c [total number of records] -s [individual record size] -o [trace file] -v
+```
+
+You can also optionally add a `-d` flag to run with debug mode turned on in order to get (first five bytes in each row) DRAM sorted run output to `output/dram.txt`, SSD sorted run output to `output/ssd.txt` (case 3), HDD sorted run output to `output/hdd.txt` (case 3), and final sorted output to `output/testData.txt`.
+```bash
+./Sort.exe -c [total number of records] -s [individual record size] -o [trace file] -d
+```
+
+Both `-d` and `-v` must be placed at the end of all the arguments, if present. Intermediate step sorted run output is available in the output folder in binary format as `ssd.bin` and `hdd.bin`.
+
 ## Contributions
 
 - Natan Lidukhover: Setting up buffers for HDD, SSD, DRAM, and integrating TOL (tree of losers) in Main.cpp
