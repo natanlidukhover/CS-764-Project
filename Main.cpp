@@ -490,9 +490,6 @@ int main(int argc, char* argv[]) {
         cout << "HDD block size is: " << hddBlockSize << endl;
         cout << "Number of blocks written to HDD: " << numHddBlocksWritten << endl;
         cout << "Number of blocks read from HDD: " << numHddBlocksRead << endl;
-        cout << "Number of blocks read from HDD: " << inputHdd->getReadCount() << endl;
-        cout << "Number of blocks read from HDD: " << outputHdd->getReadCount() << endl;
-        cout << "Number of blocks read from HDD: " << interimHdd->getReadCount() << endl;
         cout << "Total HDD access latency: " << (numHddBlocksWritten + numHddBlocksRead) * 10 << " ms" << endl;
         cout << endl;
 
