@@ -41,8 +41,8 @@ const size_t hddMaxRunCount = 97;
 const size_t ssdMaxInputBufferSize = ssdMaxRunCount * ssdBlockSize;
 const size_t hddMaxInputBufferSize = hddMaxRunCount * hddBlockSize;
 const size_t cacheRunSize = 500 * KB;
-size_t numberOfRecords = 1 * MB;  // Number of rows
-size_t rowSize = 50;              // Size of each row in bytes
+size_t numberOfRecords = 22 * MB;  // Number of rows
+size_t rowSize = 1 * KB;           // Size of each row in bytes
 size_t totalDataSize = numberOfRecords * rowSize;
 Ssd* inputHdd;
 Ssd* interimHdd;
@@ -407,6 +407,8 @@ int main(int argc, char* argv[]) {
     // Default values
     std::string outputFilename = "trace.txt";  // Output file name
     int runVerification = 0;
+    outTrace.open(outputFilename, std::ios_base::out);
+    TRACE(true);
 
     // Parse command-line arguments
     for (int i = 1; i < argc; i += 2) {
@@ -422,18 +424,6 @@ int main(int argc, char* argv[]) {
             debug = 1;
         }
     }
-
-    if (argc != 7 && debug != 1 && runVerification != 1) {
-        std::cerr << "Usage: ./sort -c [total number of records] -s [individual record size] -o [trace file]" << endl;
-        return EINPARM;
-    }
-    if ((numberOfRecords * rowSize) % ((size_t) 1 * MB) != 0) {
-        std::cerr << "((Number of records) * (record size)) should be 1 MB-aligned" << endl;
-        return EINPARM;
-    }
-
-    outTrace.open(outputFilename, std::ios_base::out);
-    TRACE(true);
 
     if (debug) {
         dramDebugOut.open("./output/dram.txt", std::ios_base::out);
