@@ -13,14 +13,14 @@ SCRS=
 HDRS=	defs.h \
 		Iterator.h Scan.h Filter.h Sort.h \
 		Dram.h Table.h tol.h Ssd.h verification.h
-SRCS=	defs.cpp Assert.cpp Test.cpp \
+SRCS=	defs.cpp Assert.cpp \
 		Iterator.cpp Scan.cpp Filter.cpp Sort.cpp \
-		Dram.cpp Table.cpp tol.cpp Ssd.cpp Main.cpp verification.cpp test_tol.cpp test_run.cpp
+		Dram.cpp Table.cpp tol.cpp Ssd.cpp Main.cpp verification.cpp
 
 # compilation targets
-OBJS=	defs.o Assert.o Test.o \
+OBJS=	defs.o Assert.o \
 		Iterator.o Scan.o Filter.o Sort.o \
-		Dram.o Table.o tol.o Ssd.o Main.o verification.o test_tol.o test_run.o
+		Dram.o Table.o tol.o Ssd.o Main.o verification.o
 
 # RCS assists
 REV=-q -f
@@ -28,13 +28,13 @@ MSG=no message
 
 # default target
 #
-Test.exe : Makefile $(OBJS)
-	g++ $(CPPFLAGS) -o Test.exe $(OBJS)
+Sort.exe : Makefile $(OBJS)
+	g++ $(CPPFLAGS) -o Sort.exe $(OBJS)
 
-trace : Test.exe Makefile
+trace : Sort.exe Makefile
 	@date > trace
-	./Test.exe >> trace
-	@size -t Test.exe $(OBJS) | sort -r >> trace
+	./Sort.exe >> trace
+	@size -t Sort.exe $(OBJS) | sort -r >> trace
 
 $(OBJS) : Makefile defs.h
 Test.o : Iterator.h Scan.h Filter.h Sort.h
@@ -55,4 +55,4 @@ co :
 	co $(REV) -l $(HDRS) $(SRCS) $(DOCS) $(SCRS)
 
 clean :
-	@rm -rf $(OBJS) Test.exe Test.exe.stackdump trace
+	@rm -rf $(OBJS) Sort.exe Sort.exe.stackdump trace
