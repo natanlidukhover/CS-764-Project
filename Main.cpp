@@ -27,6 +27,7 @@ std::ofstream hddDebugOut;
 std::ofstream finalDebugOut;
 
 int debug = 0;
+int dramDebug = 0;
 int ssdDebug = 0;
 
 const size_t ssdBlockSize = 10 * KB;  // For SSD, block size is given by bandwidth * latency = 100 MB/s * 0.0001 s = 10 KB
@@ -109,7 +110,7 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
     }
     cout << "TOL outputted " << numberOfTolRecords << " records" << endl;
     outputRun->flush();
-    if (debug) {
+    if (debug && ssdDebug) {
         for (size_t i = 0; i < numberOfTolRecords; i++) {
             uint8_t* ptr;
             outputRun->getNext(&ptr);
@@ -118,6 +119,17 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
                 ssdDebugOut << (int) ptr[j] << " ";
             }
             ssdDebugOut << endl;
+        }
+    }
+    if (debug && dramDebug) {
+        for (size_t i = 0; i < numberOfTolRecords; i++) {
+            uint8_t* ptr;
+            outputRun->getNext(&ptr);
+            dramDebugOut << "[" << i + 1 << "]";
+            for (size_t j = 0; j < 5; j++) {
+                dramDebugOut << (int) ptr[j] << " ";
+            }
+            dramDebugOut << endl;
         }
     }
 
@@ -272,7 +284,6 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
     const size_t hddLastRunSize = (hddActualDataSize % hddRunSize == 0) ? hddRunSize : (hddActualDataSize % hddRunSize);
 
     // Perform input-to-SSD-to-HDD sort
-    // size_t inputOffset = hddActualDataSize + ssdActualDataSize;
     size_t inputOffset = inputStartOffset;
     size_t hddBytesLeft = hddActualDataSize;
     size_t tNumSSDSizeRunGenerated = hddBytesLeft / hddRunSize + (hddBytesLeft % hddRunSize != 0);
@@ -283,7 +294,9 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         hddBytesLeft -= minRunSize;
     }
 
-    ssdDebug = 1;
+    if (debug) {
+        ssdDebug = 1;
+    }
     // Perform input-to-SSD sort
     size_t ssdBytesLeft = ssdActualDataSize;
     size_t tNumDRAMSizeRunGenerated = ssdBytesLeft / ssdRunSize + (ssdBytesLeft % ssdRunSize != 0);
@@ -293,7 +306,9 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         inputOffset = sortDramAndStore(minRunSize, inputOffset, ssdActualDataSize - ssdBytesLeft, TRUE, outputSsd);
         ssdBytesLeft -= minRunSize;
     }
-    ssdDebug = 0;
+    if (debug) {
+        ssdDebug = 0;
+    }
 
     // Create buffers
     uint8_t* dramInputBuffer = (uint8_t*) dram.getSpace(dramInputBufferSize);
@@ -413,7 +428,7 @@ int main(int argc, char* argv[]) {
 		return EINPARM;
 	}
 	if ((numberOfRecords * rowSize) % ((size_t) 1 * MB) != 0) {
-		std::cerr << "((Number of records) * (record size)) should be 1 MB align" << endl;
+		std::cerr << "((Number of records) * (record size)) should be 1 MB-aligned" << endl;
 		return EINPARM;
 	}
 
@@ -461,7 +476,13 @@ int main(int argc, char* argv[]) {
         cout << "----------------------Starting sort------------" << endl;
         if (totalDataSize < dramLimit) {  // Case 1: Unsorted HDD->DRAM->HDD Sorted
             cout << "Case 1: Data less than DRAM size. Only using DRAM to sort." << std::endl;
+            if (debug) {
+                dramDebug = 1;
+            }
             sortDramAndStore(totalDataSize, 0, 0, FALSE, outputHdd);
+            if (debug) {
+                dramDebug = 0;
+            }
         } else if (totalDataSize < ssdLimit) {  // Case 2: Unsorted HDD->DRAM->SSD Sorted, Sorted DRAM + Sorted SSD->HDD Sorted
             cout << "Case 2: Data less than DRAM + SSD size. Only using DRAM and SSD to sort." << std::endl;
             sortSsdAndStore(totalDataSize, 0, 0, FALSE, outputHdd);
