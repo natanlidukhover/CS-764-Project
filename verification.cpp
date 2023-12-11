@@ -70,6 +70,6 @@ void verify(const char* sortedFilePath, const char* unsortedFilePath, size_t pag
     }
 
     cout << "Verification Successful" << std::endl;
-    cout << "Pages verified: " << pageCount << std::endl;
+    //cout << "Pages verified: " << pageCount << std::endl;
     cout << "Rows verified: " << rowReadCount << std::endl;
 }
