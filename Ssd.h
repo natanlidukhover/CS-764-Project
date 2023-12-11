@@ -3,16 +3,15 @@
 
 #include <cstdio>
 #include <cstdint>  // For uint8_t
-#include "Table.h"
-#include<fstream>
+#include <fstream>
 using namespace std;
 class Ssd {
 public:
     Ssd(const char* filename, size_t size, size_t blockSize);
     ~Ssd();
 
-    int writeData(const void* data, size_t seek);
-    int readData(void* buffer, size_t offset);
+    size_t writeData(const void* data, size_t seek);
+    size_t readData(void* buffer, size_t offset);
     size_t getReadCount();
     size_t getWriteCount();
 private:
