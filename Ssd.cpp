@@ -12,7 +12,7 @@ Ssd::Ssd(const char* filename, size_t size, size_t blockSize) :
 	_size(size), _sizeOccupied(0), _readCount(0),
 	_writeCount(0), _blockSize(blockSize) {
     TRACE(true);
-    filePtr = fopen(filename, "r+");
+    filePtr = fopen(filename, "w+");
     if (filePtr == nullptr) {
         throw std::runtime_error("Failed to open file");
     }
