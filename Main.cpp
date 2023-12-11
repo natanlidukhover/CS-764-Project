@@ -407,8 +407,6 @@ int main(int argc, char* argv[]) {
     // Default values
     std::string outputFilename = "trace.txt";  // Output file name
     int runVerification = 0;
-    outTrace.open(outputFilename, std::ios_base::out);
-    TRACE(true);
 
     // Parse command-line arguments
     for (int i = 1; i < argc; i += 2) {
@@ -424,6 +422,9 @@ int main(int argc, char* argv[]) {
             debug = 1;
         }
     }
+
+    outTrace.open(outputFilename, std::ios_base::out);
+    TRACE(true);
 
     if (debug) {
         dramDebugOut.open("./output/dram.txt", std::ios_base::out);
