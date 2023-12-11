@@ -44,16 +44,27 @@ Project Group 15 on Canvas. Following are the names along with the ID numbers
   Helps in optimizing comparisons and improves time to run external merge sort
 - **Minimum count of row & column comparisons** ([tol.cpp::Class TOL](https://github.com/natanlidukhover/CS764-Project/blob/151c72b0719a4629e72e2ad6d5970118f2cb0499/tol.cpp#L292))
   Implemented in TreeOfLosers and offset value coding to compare rows and find the first distinct column
-- **Cache sized mini runs (tol.cpp::Class Run)**:
-  Implemented using getNext and setNext methods
-- Device optimized page sizes(Main.cpp::blockSize variable)
-- Verifying sets of rows and values/sort order
+- **Cache sized mini runs** ([Main.cpp::sortDramandStore](https://github.com/natanlidukhover/CS764-Project/blob/8870c03b8b417f5c89c76e2422b1c3402fd1def7/Main.cpp#L92)):
+  We are generating cache sized mini runs and then quick sorting them
+- **Device optimized page sizes**([Main.cpp::blockSize variable](https://github.com/natanlidukhover/CS764-Project/blob/2da37b8da65a8621e9b1db6b9ed868b1148f2ff5/Main.cpp#L34C1-L35C36))
+  Using device optimized page sizes we can use the entire bandwidth of the device rather than constraining it
+- **Spilling memory to SSD**([Main.cpp::sortSsdandStore()](https://github.com/natanlidukhover/CS764-Project/blob/2da37b8da65a8621e9b1db6b9ed868b1148f2ff5/Main.cpp#L148C1-L148C1)) When the memory is full in DRAM we utilize the SSD to store sorted runs and then merge them using TreeOfLosers and output the sorted output to SSD.
+- **Spilling from SSD to Disk**([Main.cpp::sortHddAndStore()](https://github.com/natanlidukhover/CS764-Project/blob/2da37b8da65a8621e9b1db6b9ed868b1148f2ff5/Main.cpp#L350))
+  When the memory is full in SSD we utilize the HDD to store sorted runs and then merge them using TreeofLosers and store it on disk.
+- **Graceful degradation into merging**([Main.cpp::sortDramAndStore()](https://github.com/natanlidukhover/CS764-Project/blob/2da37b8da65a8621e9b1db6b9ed868b1148f2ff5/Main.cpp#L102))
+  Final merge step in Dram which ensures graceful degradation
+- **Graceful degradation into merging beyond one step**([Main.cpp::sortDramAndStore()](https://github.com/natanlidukhover/CS764-Project/blob/2da37b8da65a8621e9b1db6b9ed868b1148f2ff5/Main.cpp#L102))
+  Final merge step in HDD which internally uses SSD and DRAM merges to gracefully degrade
+- **Verifying sort order** ([verification.cpp::verify()](https://github.com/natanlidukhover/CS764-Project/blob/8870c03b8b417f5c89c76e2422b1c3402fd1def7/verification.cpp#L26))
+  Helps to ensure that sort order is correct and that external merge sort is implemented
 
-- run size > memory size
-- Spilling memory to SSD
-- Spilling from SSD to Disk
-- Graceful degradation
--
+- **Verifying sets of rows and values**([verification.cpp::verify()](https://github.com/natanlidukhover/CS764-Project/blob/8870c03b8b417f5c89c76e2422b1c3402fd1def7/verification.cpp#L63))
+  Helps to ensure that the data is not corrupted and the input data matches with output data
+
+- **Run size > memory size** ([Main.cpp::sortHddAndStore()](https://github.com/natanlidukhover/CS764-Project/blob/2da37b8da65a8621e9b1db6b9ed868b1148f2ff5/Main.cpp#L261C1-L262C1)):
+  We do use run size greater than DRAM size for sorting large amount of data to speed up sorting
+- **Optimized Merge Patterns**([Main.cpp::sortHddandStore](https://github.com/natanlidukhover/CS764-Project/blob/8870c03b8b417f5c89c76e2422b1c3402fd1def7/Main.cpp#L262))
+  Implemented to make efficient use of all storage devices
 
 ## Contributions
 
