@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "defs.h"
-#include "Table.h"
 #include <fstream>
 using namespace std;
 // -----------------------------------------------------------------
@@ -88,38 +87,3 @@ char const * OkBad (bool const b)
 {
 	return b ? "Ok" : "Bad";
 } // OkBad
-
-/**
- * Offset-value code calculation for a row given its previous row, the domain, the arity, and if the sort is ascending
- * For first row, input a row of zeros
- * 
- * @param prevRow is the pointer to the Row of records before the one for which the OVC is being calculated
- * @param currentRow is the pointer to the Row of records for which the OVC is being calculated
- * @param domain is the size_t representing the number of values that can be placed as a Record
- * @param artiy is the size_t representing the number of columns
-*/
-unsigned short calculateOffsetValueCode(Table t, size_t prevRow, size_t
-		currentRow, size_t domain,  size_t arity, bool isAscending) {
-	unsigned short offset = t._rowSize;
-	unsigned short value = domain;
-	for (unsigned short i = 0; i < t._rowSize; i++) {
-		if (t[currentRow][i] != t[prevRow][i]) {
-			offset = i;
-			value = t[currentRow][i];
-			break;
-		}
-	}
-
-	if (isAscending) {
-		offset = arity - offset;
-	} else {
-		value = domain - value;
-	}
-
-	// E.g. domain is 1 to 99 -> 100; offset is 3; value is 94 (domain 100 - actual value of 6);
-	// zerosInDomain = floor(log10(abs(100))) = floor(2) = 2;
-	// offsetValueCode = offset * 10^2 + value = 3 * 100 + 94 = 300 + 94 = 394
-	unsigned short zerosInDomain = floor(log10(domain));
-	unsigned short offsetValueCode = offset * pow(10, zerosInDomain);
-	return offsetValueCode + value;
-}

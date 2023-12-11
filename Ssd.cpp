@@ -6,7 +6,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "Table.h"
 #include "defs.h"
 #define cout outTrace
 
@@ -25,11 +24,12 @@ Ssd::~Ssd() {
 
 /**
  * Assume that the data size is always a multiple of _blockSize
- * @param data: Write _blockSize amount of data present in pointer buffer
- * @param seek: write data from buffer pointer starting at offset seek from ssd
- * @returns The number of bytes written. If we reach end of file, then we return 0
+ * @param const void* data: Write _blockSize amount of data present in pointer buffer
+ * @param size_t seek: write data from buffer pointer starting at offset seek from ssd
+ *
+ * @return size_t: The number of bytes written. If we reach end of file, then we return 0
  */
-int Ssd::writeData(const void* data, size_t seek) {
+size_t Ssd::writeData(const void* data, size_t seek) {
     if (seek + _blockSize > _size) {
         cout << "Found less size to write, hence exiting.Offset seek:" << seek << " BlockSize:" << _blockSize << " Size of storage" << _size << endl;
         return 0;
@@ -43,11 +43,12 @@ int Ssd::writeData(const void* data, size_t seek) {
 }
 
 /**
- * @param buffer: Read _blockSize amount of data in pointer buffer
- * @param seek: Read data into buffer pointer starting at offset seek from hdd
- * @returns The number of bytes read. If we reach end of file, then we return 0
+ * @param void* buffer: Read _blockSize amount of data in pointer buffer
+ * @param size_t seek: Read data into buffer pointer starting at offset seek from hdd
+ *
+ * @return size_t: The number of bytes read. If we reach end of file, then we return 0
  */
-int Ssd::readData(void* buffer, size_t seek) {
+size_t Ssd::readData(void* buffer, size_t seek) {
     if (seek + _blockSize > _size) {
         return 0;
     }

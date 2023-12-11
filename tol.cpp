@@ -203,7 +203,7 @@ void TOL::clearWinner(Node& n) {
 }
 
 /**
- * Its assume that none of curr, l and r is INF or EMPTY node
+ * Its assume that none of curr, l, and r is INF or EMPTY node
  */
 void TOL::calculateIWinner(Node& curr, Node& l, Node& r, size_t domain = 10, size_t arity = 0, bool isAscending = true) {
     if (arity == 0)
@@ -429,13 +429,18 @@ void TOL::cmpNodes(Node& curr, Node& l, Node& r) {
     }
 }
 
+
+/**
+ * Performs one leaf-to-root pass of the tree of losers, outputting to the output run and getting
+ * the next record from the corresponding input run as needed
+ * 
+ * @return int: Exit code EINF if the winner is infinite, the return code from output->setNext if that was not
+ * SUCCESS, the return code from input->getNext if that was not SUCCESS, or otherwise SUCCESS
+*/
 int TOL::pass() {
     // Check for infinite case
     if (nodeList[0].winnerNT == NT_INF) {
         return EINF;
-    }
-    if (nodeList[0].winnerKey == NULL) {
-        cout << "Winner node type: " << nodeList[0].winnerNT << " and key: " << nodeList[0].winnerKey << endl;
     }
     // Store current winner
     int ret = output->setNext(nodeList[0].winnerKey);

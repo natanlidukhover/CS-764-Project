@@ -11,16 +11,16 @@ SCRS=
 
 # headers and code sources
 HDRS=	defs.h \
-		Iterator.h Scan.h Filter.h Sort.h \
-		Dram.h Table.h tol.h Ssd.h verification.h
+		Iterator.h Scan.h Sort.h \
+		Dram.h tol.h Ssd.h verification.h
 SRCS=	defs.cpp Assert.cpp \
-		Iterator.cpp Scan.cpp Filter.cpp Sort.cpp \
-		Dram.cpp Table.cpp tol.cpp Ssd.cpp Main.cpp verification.cpp
+		Iterator.cpp Scan.cpp Sort.cpp \
+		Dram.cpp tol.cpp Ssd.cpp Main.cpp verification.cpp
 
 # compilation targets
 OBJS=	defs.o Assert.o \
-		Iterator.o Scan.o Filter.o Sort.o \
-		Dram.o Table.o tol.o Ssd.o Main.o verification.o
+		Iterator.o Scan.o Sort.o \
+		Dram.o tol.o Ssd.o Main.o verification.o
 
 # RCS assists
 REV=-q -f
@@ -37,10 +37,9 @@ trace : Sort.exe Makefile
 	@size -t Sort.exe $(OBJS) | sort -r >> trace
 
 $(OBJS) : Makefile defs.h
-Test.o : Iterator.h Scan.h Filter.h Sort.h
-Iterator.o Scan.o Filter.o Sort.o : Iterator.h
+Test.o : Iterator.h Scan.h Sort.h
+Iterator.o Scan.o Sort.o : Iterator.h
 Scan.o : Scan.h
-Filter.o : Filter.h
 Sort.o : Sort.h
 
 list : Makefile

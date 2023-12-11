@@ -4,12 +4,10 @@
 #include <iostream>
 
 #include "Dram.h"
-#include "Filter.h"
 #include "Iterator.h"
 #include "Scan.h"
 #include "Sort.h"
 #include "Ssd.h"
-#include "Table.h"
 #include "defs.h"
 #include "tol.h"
 #include "verification.h"
