@@ -1,0 +1,46 @@
+>>>>> main Main.cpp 427
+-------------------------------Input--------------------------
+Total number of records: 2500000
+Size of one record: 50
+Trace file name: 125MB_Trace.txt
+Total data to be sorted in bytes: 125000000
+
+----------------------Random number generator-----------------
+Random data will be written to the file ./input/testData.bin
+>>>>> run Scan.cpp 115
+125000000 bytes of random data generated and stored in HDD
+<<<<< run Scan.cpp 115
+
+----------------------Starting sort------------
+Case 2: Data less than DRAM + SSD size. Only using DRAM and SSD to sort.
+>>>>> sortSsdAndStore Main.cpp 157
+Generating 1 run each of size 99000000 or 26000000 using DRAM and storing it in SSD
+>>>>> sortDramAndStore Main.cpp 66
+Read 26000000 bytes from HDD to DRAM and using quicksort to generate 52 runs each of size 500000
+All runs needed for merging using DRAM generated
+Using tree of losers to merge 52 runs
+>>>>> TOL tol.cpp 508
+<<<<< TOL tol.cpp 508
+TOL outputted 520000 records and 26000000 bytes to output device SSD
+<<<<< sortDramAndStore Main.cpp 66
+Generating 198 runs each of size 500000 and storing it in DRAM
+All runs needed for merging using DRAM and SSD generated
+1 buffers allocated for runs in SSD and 198 buffers allocated for runs in DRAM
+Using tree of losers to merge 199 runs
+>>>>> TOL tol.cpp 508
+<<<<< TOL tol.cpp 508
+TOL outputted 2500000 records and 125000000 bytes to output device HDD
+<<<<< sortSsdAndStore Main.cpp 157
+Sorting of 2500000 records, each of size 50 bytes completed successfully!!!
+
+----------------------Statistics about sorting------------
+HDD block size is: 1000000
+Number of blocks written to HDD: 125
+Number of blocks read from HDD: 125
+Total HDD access latency: 2500 ms
+
+SSD block size is: 10000
+Number of blocks written to SSD: 2600
+Number of blocks read from SSD: 2600
+Total SSD access latency: 520 ms
+<<<<< main Main.cpp 427

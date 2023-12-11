@@ -108,7 +108,7 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
     for (size_t i = 0; i < numberOfTolRecords + 1; i++) {
         tol->pass();
     }
-    cout << "TOL outputted " << numberOfTolRecords << " records" << endl;
+    cout << "TOL outputted " << numberOfTolRecords << " records and " << bytesToFill << " bytes to output device " << (isOutputSsd ? "SSD" : "HDD") << endl;
     outputRun->flush();
     if (debug && ssdDebug) {
         for (size_t i = 0; i < numberOfTolRecords; i++) {
@@ -229,7 +229,7 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
     for (size_t i = 0; i < numberOfTolRecords + 1; i++) {
         tol->pass();
     }
-    cout << "TOL outputted " << numberOfRecords << " records" << endl;
+    cout << "TOL outputted " << numberOfTolRecords << " records and " << bytesToFill << " bytes to output device " << (isOutputSsd ? "SSD" : "HDD") << endl;
     outputRun->flush();
     if (debug) {
         for (size_t i = 0; i < numberOfTolRecords; i++) {
@@ -376,7 +376,7 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
     for (size_t i = 0; i < numberOfRecords + 1; i++) {
         tol->pass();
     }
-    cout << "TOL outputted " << numberOfRecords << " records" << endl;
+    cout << "TOL outputted " << numberOfRecords << " records and " << bytesToFill << " bytes to output device HDD" << endl;
     outputRun->flush();
     if (debug) {
         for (size_t i = 0; i < numberOfRecords; i++) {

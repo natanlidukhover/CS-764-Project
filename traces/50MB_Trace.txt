@@ -1,0 +1,36 @@
+>>>>> main Main.cpp 427
+-------------------------------Input--------------------------
+Total number of records: 1000000
+Size of one record: 50
+Trace file name: 50MB_Trace.txt
+Total data to be sorted in bytes: 50000000
+
+----------------------Random number generator-----------------
+Random data will be written to the file ./input/testData.bin
+>>>>> run Scan.cpp 115
+50000000 bytes of random data generated and stored in HDD
+<<<<< run Scan.cpp 115
+
+----------------------Starting sort------------
+Case 1: Data less than DRAM size. Only using DRAM to sort.
+>>>>> sortDramAndStore Main.cpp 66
+Read 50000000 bytes from HDD to DRAM and using quicksort to generate 100 runs each of size 500000
+All runs needed for merging using DRAM generated
+Using tree of losers to merge 100 runs
+>>>>> TOL tol.cpp 508
+<<<<< TOL tol.cpp 508
+TOL outputted 1000000 records and 50000000 bytes to output device HDD
+<<<<< sortDramAndStore Main.cpp 66
+Sorting of 1000000 records, each of size 50 bytes completed successfully!!!
+
+----------------------Statistics about sorting------------
+HDD block size is: 1000000
+Number of blocks written to HDD: 50
+Number of blocks read from HDD: 50
+Total HDD access latency: 1000 ms
+
+SSD block size is: 10000
+Number of blocks written to SSD: 0
+Number of blocks read from SSD: 0
+Total SSD access latency: 0 ms
+<<<<< main Main.cpp 427
