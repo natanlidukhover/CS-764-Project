@@ -13,6 +13,7 @@
 class Storage
 {
 	friend class Run;
+	friend class TOL;
 	size_t blockSize;				// optimal block size for SSD/HDD
 	size_t srcSeek;					// seek in SSD/HDD where run starts
 	uint8_t *d;						// pointer to DRAM buffer
