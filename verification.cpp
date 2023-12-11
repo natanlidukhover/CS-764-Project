@@ -47,45 +47,15 @@ void verify(const char* sortedFilePath, const char* unsortedFilePath, size_t pag
     size_t rowReadCount = 0;
     size_t pageCount = 0;
     while (unsortedFile.read(reinterpret_cast<char*>(buffer.data()), rowSize)) {
-        std::vector<uint8_t> unsortedRow(buffer);
-        
-        std::vector<uint8_t> sorted_buffer(rowSize);
-        std::ifstream sortedFileRepeat(sortedFilePath, std::ios::binary);
+        std::vector<uint8_t> currentRow(buffer);
 
-        bool found = false;
-        while(sortedFileRepeat.read(reinterpret_cast<char*>(sorted_buffer.data()), rowSize)){
-            std::vector<uint8_t> currentRowSorted(sorted_buffer);
-            int cnt = 0;
-            for(size_t i = 0; i < rowSize; i++)
-            {
-                if(currentRowSorted[i] == unsortedRow[i]){
-                    cnt += 1;
-                    continue;
-                }
-                else{
-                    cnt = 0;
-                    break;
-                }
+        if (sortedDataSet.find(currentRow) == sortedDataSet.end()) {
+            std::cerr << "Row not found in sorted data: ";
+            for (auto val : currentRow) {
+                std::cerr << static_cast<int>(val) << " ";
             }
-            if(cnt == rowSize) {
-                found = true;
-                break;
-            }
-        }
-        if(!found){
-            std::cerr << "Rowss not found in sorted data: ";
-            // for (auto val : unsortedRow) {
-            //     std::cerr << static_cast<int>(val) << " ";
-            // }
             std::cerr << std::endl;
         }
-        // if (sortedDataSet.find(currentRow) == sortedDataSet.end()) {
-    //     std::cerr << "Row not found in sorted data: ";
-        //     for (auto val : currentRow) {
-        //         std::cerr << static_cast<int>(val) << " ";
-        //     }
-        //     std::cerr << std::endl;
-        // }
 
         rowReadCount++;
         intsReadCount += rowSize;
