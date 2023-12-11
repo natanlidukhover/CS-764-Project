@@ -60,7 +60,7 @@ Project Group 15 on Canvas. Following are the names along with the ID numbers
 
 - **Verifying sets of rows and values**([verification.cpp::verify()](https://github.com/natanlidukhover/CS764-Project/blob/8870c03b8b417f5c89c76e2422b1c3402fd1def7/verification.cpp#L63))
   Helps to ensure that the data is not corrupted and the input data matches with output data
-
+  takes two individual binary files and based off of designated row size and page size, verifies that all rows in the unsorted data are present in the sorted data, and that the sorted data is indeed sorted
 - **Run size > memory size** ([Main.cpp::sortHddAndStore()](https://github.com/natanlidukhover/CS764-Project/blob/2da37b8da65a8621e9b1db6b9ed868b1148f2ff5/Main.cpp#L261C1-L262C1)):
   We do use run size greater than DRAM size for sorting large amount of data to speed up sorting
 - **Optimized Merge Patterns**([Main.cpp::sortHddandStore](https://github.com/natanlidukhover/CS764-Project/blob/8870c03b8b417f5c89c76e2422b1c3402fd1def7/Main.cpp#L262))
