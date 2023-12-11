@@ -63,6 +63,7 @@ Ssd* outputHdd ;
  * the runs together, and pushes the sorted output to the given storage device through an output buffer
  */
 size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset, const size_t outputStartOffset, const int isOutputSsd, Ssd* outputDevice) {
+    TRACE(true);
     // Create constants
     size_t outputBlockSize = hddBlockSize;
     if (isOutputSsd) {
@@ -88,6 +89,7 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
         bytesRead += inputBlockSize;
         inputOffset += inputBlockSize;
     }
+	cout << "Read " << bytesRead << " bytes from HDD to DRAM and using quicksort to generate " << numberOfCacheRuns << " runs each of size " << cacheRunSize << endl;
 
     // Generate cache-size runs over the input buffer and sort them
     Run** runs = new Run*[numberOfCacheRuns];
@@ -99,15 +101,19 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
         runs[i] = new Run(inputHdd, inputBuffer + (i * cacheRunSize), inputBlockSize, 0, 0, cacheRunSize, cacheRunSize, rowSize, cacheRunSize);
         quickSort(inputBuffer + (i * cacheRunSize), cacheRunSize / rowSize, rowSize);
     }
+	cout << "All runs needed for merging using DRAM generated" << endl;
     Run* outputRun = new Run(outputDevice, outputBuffer, outputBlockSize, outputStartOffset, 0, bytesToFill, outputBufferSize, rowSize, 0);
 
     // Merge these runs using Tree-of-Losers and output to the given output storage device
     ETable* t = new ETable(numberOfRecords, rowSize, rowSize, 0);
+
+	cout << "Using Tree-of-loosers to merge " << numberOfCacheRuns<< " runs" << endl;
     TOL* tol = new TOL(numberOfCacheRuns, runs, outputRun, *t);
     size_t numberOfTolRecords = bytesToFill / rowSize;
     for (size_t i = 0; i < numberOfTolRecords + 1; i++) {
         tol->pass();
     }
+	cout << "TOL outputed " << numberOfTolRecords << " records" << endl;
     outputRun->flush();
     //for (size_t i = 0; i < numberOfRecords; i++) {
     //    uint8_t* ptr;
@@ -150,6 +156,7 @@ size_t sortDramAndStore(const size_t bytesToFill, const size_t inputStartOffset,
  * input storage device
  */
 size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, const size_t outputStartOffset, const int isOutputSsd, Ssd* outputDevice) {
+    TRACE(true);
     // Create constants
     size_t outputBlockSize = hddBlockSize;
     if (isOutputSsd) {
@@ -170,6 +177,8 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
     // Perform input-to-SSD sort and merge through DRAM
     size_t inputOffset = inputStartOffset;
     size_t ssdBytesLeft = ssdActualDataSize;
+	size_t tNumSSDSizeRunGenerated = ssdBytesLeft / ssdRunSize + (ssdBytesLeft % ssdRunSize != 0);
+	cout << "Generating " << tNumSSDSizeRunGenerated << " run each of size 99 MB using DRAM and storing it in SSD" << endl;
     while (ssdBytesLeft > 0) {
         size_t minRunSize = std::min(ssdRunSize, ssdBytesLeft);
         inputOffset = sortDramAndStore(minRunSize, inputOffset, ssdActualDataSize - ssdBytesLeft, TRUE, outputSsd);
@@ -193,6 +202,7 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
         bytesRead += inputBlockSize;
         inputOffset += inputBlockSize;
     }
+	cout << "Read " << bytesRead << " from HDD to DRAM and using quicksort to generate " << numberOfCacheRuns << " each of size " << cacheRunSize << endl;
     // Generate cache-size sorted runs over the input buffer
     Run** runs = new Run*[numberOfCacheRuns + numberOfSsdRuns];
     for (size_t i = 0; i < numberOfCacheRuns; i++) {
@@ -203,6 +213,7 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
         runs[i] = new Run(inputHdd, dramInputBuffer + (i * cacheRunSize), inputBlockSize, 0, 0, cacheRunSize, cacheRunSize, rowSize, cacheRunSize);
         quickSort(dramInputBuffer + (i * cacheRunSize), cacheRunSize / rowSize, rowSize);
     }
+	cout << "All runs needed for merging using DRAM and SSD generated. Allocating run's buffer in DRAM" << endl;
     for (size_t i = 0; i < numberOfSsdRuns; i++) {
         size_t minRunSize = ssdRunSize;
         if (i == numberOfSsdRuns - 1) {
@@ -210,10 +221,13 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
         }
         runs[numberOfCacheRuns + i] = new Run(outputSsd, ssdInputBuffers[i], ssdBlockSize, i * ssdRunSize, minRunSize, minRunSize, ssdBlockSize, rowSize, 0);
     }
+	cout << numberOfSsdRuns << " buffers allocated for runs in SSD" << endl;
     Run* outputRun = new Run(outputDevice, outputBuffer, outputBlockSize, outputStartOffset, 0, bytesToFill, outputBufferSize, rowSize, 0);
 
     // Merge these runs with the SSD input buffers using Tree-of-Losers and output to HDD using outputBuffer
     ETable* t = new ETable(numberOfRecords, rowSize, rowSize, 0);
+
+	cout << "Generating Tree-of-loosers with " << numberOfCacheRuns + numberOfSsdRuns << " runs." << endl;
     TOL* tol = new TOL(numberOfCacheRuns + numberOfSsdRuns, runs, outputRun, *t);
     const size_t numberOfCacheRecords = dramInputBufferSize / rowSize;
     const size_t numberOfSsdRecords = ssdActualDataSize / rowSize;
@@ -221,6 +235,7 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
     for (size_t i = 0; i < numberOfTolRecords + 1; i++) {
         tol->pass();
     }
+	cout << "TOL outputed " << numberOfRecords << " records" << endl;
     outputRun->flush();
     if (debug) {
         for (size_t i = 0; i < numberOfTolRecords; i++) {
@@ -251,6 +266,7 @@ size_t sortSsdAndStore(const size_t bytesToFill, const size_t inputStartOffset, 
  * @return size_t: offset of next block not read yet
  */
 size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) {
+    TRACE(true);
     // Create constants
     const size_t outputBlockSize = hddBlockSize;
     const size_t inputBlockSize = hddBlockSize;
@@ -273,6 +289,8 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
     //size_t inputOffset = hddActualDataSize + ssdActualDataSize;
     size_t inputOffset = inputStartOffset;
     size_t hddBytesLeft = hddActualDataSize;
+	size_t tNumSSDSizeRunGenerated = hddBytesLeft / hddRunSize + (hddBytesLeft % hddRunSize != 0);
+	cout << "Generating " << tNumSSDSizeRunGenerated << " run each of size 9.9 GB using DRAM and SSD and storing it in HDD" << endl;
     while (hddBytesLeft > 0) {
         size_t minRunSize = std::min(hddRunSize, hddBytesLeft);
         inputOffset = sortSsdAndStore(minRunSize, inputOffset, hddActualDataSize - hddBytesLeft, FALSE, interimHdd);
@@ -282,6 +300,8 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
     ssdDebug = 1;
     // Perform input-to-SSD sort
     size_t ssdBytesLeft = ssdActualDataSize;
+	size_t tNumDRAMSizeRunGenerated = ssdBytesLeft / ssdRunSize + (ssdBytesLeft % ssdRunSize != 0);
+	cout << "Generating " << tNumDRAMSizeRunGenerated << " run each of size 99 MB using DRAM and storing it in SSD" << endl;
     while (ssdBytesLeft > 0) {
         size_t minRunSize = std::min(ssdRunSize, ssdBytesLeft);
         inputOffset = sortDramAndStore(minRunSize, inputOffset, ssdActualDataSize - ssdBytesLeft, TRUE, outputSsd);
@@ -310,6 +330,7 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         bytesRead += inputBlockSize;
         inputOffset += inputBlockSize;
     }
+	cout << "Read " << bytesRead << " from HDD to DRAM and using quicksort to generate " << numberOfCacheRuns << " each of size " << cacheRunSize << endl;
     // Generate cache-size sorted runs over the input buffer
     Run** runs = new Run*[numberOfCacheRuns + ssdMaxRunCount + numberOfHddRuns];
     for (size_t i = 0; i < numberOfCacheRuns; i++) {
@@ -331,6 +352,7 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
             dramDebugOut << endl;
         }
     }
+	cout << "All runs needed for final merging generated. Allocating run's buffer in DRAM" << endl;
     for (size_t i = 0; i < ssdMaxRunCount; i++) {
         size_t minRunSize = ssdRunSize;
         if (i == ssdMaxRunCount - 1) {
@@ -338,6 +360,7 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         }
         runs[numberOfCacheRuns + i] = new Run(outputSsd, ssdInputBuffers[i], ssdBlockSize, i * ssdRunSize, minRunSize, minRunSize, ssdBlockSize, rowSize, 0);
     }
+	cout << ssdMaxRunCount << " buffers allocated for runs in SSD" << endl;
     for (size_t i = 0; i < numberOfHddRuns; i++) {
         size_t minRunSize = hddRunSize;
         if (i == numberOfHddRuns - 1) {
@@ -345,14 +368,18 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
         }
         runs[numberOfCacheRuns + ssdMaxRunCount + i] = new Run(interimHdd, hddInputBuffers[i], hddBlockSize, i * hddRunSize, minRunSize, minRunSize, hddBlockSize, rowSize, 0);
     }
+	cout << numberOfHddRuns << " buffers allocated for runs in SSD" << endl;
     Run* outputRun = new Run(outputHdd, outputBuffer, outputBlockSize, 0, 0, bytesToFill, outputBufferSize, rowSize, 0);
 
     // Merge these runs with the SSD and HDD input buffers using Tree-of-Losers and output to HDD using hddOutputBuffer
     ETable* t = new ETable(numberOfRecords, rowSize, rowSize, 0);
+
+	cout << "Generating Tree-of-loosers with " << numberOfCacheRuns + ssdMaxRunCount + numberOfHddRuns << " runs." << endl;
     TOL* tol = new TOL(numberOfCacheRuns + ssdMaxRunCount + numberOfHddRuns, runs, outputRun, *t);
     for (size_t i = 0; i < numberOfRecords + 1; i++) {
         tol->pass();
     }
+	cout << "TOL outputed " << numberOfRecords << " records" << endl;
     outputRun->flush();
     if (debug) {
         for (size_t i = 0; i < numberOfRecords; i++) {
@@ -381,7 +408,7 @@ size_t sortHddAndStore(const size_t bytesToFill, const size_t inputStartOffset) 
 
 int main(int argc, char* argv[]) {
     // Default values
-    std::string outputFilename = "o.txt";  // Output file name
+    std::string outputFilename = "trace.txt";  // Output file name
     int runVerification = 0;
     outTrace.open(outputFilename, std::ios_base::out);
     TRACE(true);
@@ -420,25 +447,36 @@ int main(int argc, char* argv[]) {
         totalDataSize = numberOfRecords * rowSize;  // Total amount of data in bytes
 
         // Print the values
+		cout << "-------------------------------Input--------------------------" << endl;
         cout << "Total number of records: " << numberOfRecords << endl;
         cout << "Size of one record: " << rowSize << endl;
-        cout << "Output file name: " << outputFilename << endl;
+        cout << "Trace file name: " << outputFilename << endl;
+		cout << "Total data to be sorted in bytes: " << numberOfRecords * rowSize << endl << endl;
 
-        //ScanIterator* const sc_it = new ScanIterator(new ScanPlan(totalDataSize, hddBlockSize));
-        //sc_it->run();
+		cout << "----------------------Random number generator-----------------" << endl;
+        ScanIterator* const sc_it = new ScanIterator(new ScanPlan(totalDataSize, hddBlockSize));
+        sc_it->run();
+		cout << endl;
 
         /**
          * Case 1: < 100 MB
          * Case 2: < 10 GB
          * Case 3: >= 10 GB
          */
+		cout << "----------------------Starting sort------------" << endl;
         if (totalDataSize < dramLimit) {  // Case 1: Unsorted HDD->DRAM->HDD Sorted
+			cout << "Case 1: Data less than DRAM size. Only using DRAM to sort." << std::endl;
             sortDramAndStore(totalDataSize, 0, 0, FALSE, outputHdd);
         } else if (totalDataSize < ssdLimit) {  // Case 2: Unsorted HDD->DRAM->SSD Sorted, Sorted DRAM + Sorted SSD->HDD Sorted
+			cout << "Case 2: Data less than DRAM + SSD size. Only using DRAM and SSD to sort." << std::endl;
+            sortDramAndStore(totalDataSize, 0, 0, FALSE, outputHdd);
             sortSsdAndStore(totalDataSize, 0, 0, FALSE, outputHdd);
         } else {  // Case 3: Unsorted HDD->DRAM->SSD Sorted, Sorted DRAM + Sorted SSD->HDD Sorted, Sorted DRAM + Sorted SSD + Sorted HDD->HDD Sorted
+			cout << "Case 3: Data less than DRAM + SSD + HDD size. Using DRAM, SSD and HDD to sort." << std::endl;
             sortHddAndStore(totalDataSize, 0);
         }
+		cout << "Sorting of " << numberOfRecords << " records, each of size " << rowSize << " bytes completed successfully!!!" << endl;
+		cout << endl;
     }
 
     return 0;

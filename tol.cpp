@@ -524,6 +524,7 @@ void TOL::print() {
 }
 
 TOL::TOL(size_t nor, Run **rl, Run *o, ETable _t): runList(rl), output(o), numOfRun(nor),t(_t) {
+    TRACE(true);
 	if (nor > 512) {
 		throw std::runtime_error("TOL doesn't fit in cache");
 	}

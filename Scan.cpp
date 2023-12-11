@@ -13,37 +13,31 @@ using namespace std;
 
 ScanPlan::ScanPlan (RowCount const count) : _count (count)
 {
-	TRACE (true);
 } // ScanPlan::ScanPlan
 
 ScanPlan::ScanPlan (RowCount const count, size_t blockSize) : _count (count), blockSize(blockSize)
 {
-	TRACE (true);
 } // ScanPlan::ScanPlan
 
 ScanPlan::~ScanPlan ()
 {
-	    TRACE(true);
 } // ScanPlan::~ScanPlan
 
 Iterator * ScanPlan::init () const
 {
-	    TRACE(true);
 	return new ScanIterator (this);
 } // ScanPlan::init
 
 ScanIterator::ScanIterator (ScanPlan const * const plan) :
 	_plan (plan), _count (plan->_count), blockSize(plan->blockSize)
 {
-	    TRACE(true);
 
     this->file = "./input/testData.bin";
-    cout << "Random data will be written to the file ./data/testData.bin" << endl;
+    cout << "Random data will be written to the file " << this->file << endl;
 } // ScanIterator::ScanIterator
 
 ScanIterator::~ScanIterator ()
 {
-	TRACE (true);
 	traceprintf ("produced %lu of %lu rows\n",
 			(unsigned long) (_count),
 			(unsigned long) (_plan->_count));
@@ -51,7 +45,6 @@ ScanIterator::~ScanIterator ()
 
 bool ScanIterator::next ()
 {
-	    TRACE(true);
 	if (_count >= _plan->_count)
 		return false;
 
@@ -122,7 +115,6 @@ vector<int> ScanIterator::readIntegersFromBinaryFile(const std::string& filename
     vector<int> res;
     ifstream inFile (filename, ios::in | ios::binary | std::ios::ate);
     std::streamsize fileSize = inFile.tellg();
-	    TRACE(true);
     //cout << "Size of input file is "<< fileSize << " bytes" << std::endl;
     //seekg used as ate mode moves it to end of file
     inFile.seekg(0, ios::beg);
@@ -144,7 +136,6 @@ vector<int> ScanIterator::run ()
     //generate chunkSize bytes of random data at a time and write it to file
     size_t blockSize = this->blockSize;
     size_t blocks = countOfBytes/blockSize;
-    cout << "Number of chunks to write: " << blocks << " each having size " << blockSize << endl;
     for(size_t i = 0; i < blocks; i++)
     {
         std::vector<int> currChunk = this->getParameters(blockSize);
@@ -162,6 +153,7 @@ vector<int> ScanIterator::run ()
         this->saveIntegersToBinaryFile(remainingChunk, this->file, blocks > 0);
     }
 	
+	cout << countOfBytes << " bytes of random data generated and stored in HDD" << endl;
     vector<int> numbers = readIntegersFromBinaryFile(this->file, 1, countOfBytes);
     return numbers;
 } // ScanIterator::next
