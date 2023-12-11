@@ -47,7 +47,8 @@ Project Group 15 on Canvas. Following are the names along with the ID numbers
 - **Cache sized mini runs (tol.cpp::Class Run)**:
   Implemented using getNext and setNext methods
 - Device optimized page sizes(Main.cpp::blockSize variable)
-- Verifying sets of rows and values/sort order
+- **Verifying sets of rows and values/sort order(verification.cpp::verify())**
+  takes two individual binary files and based off of designated row size and page size, verifies that all rows in the unsorted data are present in the sorted data, and that the sorted data is indeed sorted
 
 - run size > memory size
 - Spilling memory to SSD
